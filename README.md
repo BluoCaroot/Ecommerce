@@ -1,4 +1,4 @@
 Ecommerce project at route acadamey
 
 
-todo: apply pagination and validation
+todo: simplify apis like add and update products
