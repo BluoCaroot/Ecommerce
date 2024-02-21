@@ -9,10 +9,11 @@ export const auth = (accessRoles, require = true) =>
     {
         try 
         {
-            if (!require)
+            const { accesstoken } = req.headers
+
+            if (!require && !accesstoken)
                 return next()
                 
-            const { accesstoken } = req.headers
             if (!accesstoken) return next(new Error('please login first', { cause: 400 }))
 
             if (!accesstoken.startsWith(process.env.TOKEN_PREFIX)) return next(new Error('invalid token prefix', { cause: 400 }))

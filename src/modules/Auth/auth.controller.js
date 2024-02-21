@@ -14,7 +14,6 @@ export const signUp = async (req, res, next) => {
         return next(new Error('Email already exists,Please use another email or sigin in if you already have an account', { cause: 409 }))
 
     const usertoken = jwt.sign({ email }, process.env.JWT_SECRET_VERFICATION, { expiresIn: '2m' })
-
     const isEmailSent = await sendEmailService(
     {
         to: email,

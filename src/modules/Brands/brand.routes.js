@@ -6,20 +6,25 @@ import { multerMiddleHost } from '../../middlewares/multer.js'
 import { allowedExtensions } from '../../utils/allowed-extensions.js'
 import { endPointsRoles } from './brand.endpoints.js'
 import { auth } from '../../middlewares/auth.middleware.js'
+import { validation } from '../../middlewares/validation.middleware.js'
+import * as brandValidationSchema from './brand.validationSchemas.js'
 const router = Router()
 
 
 router.post('/',
-    auth(endPointsRoles.BRAND_PERM),
     multerMiddleHost(allowedExtensions.image).single('image'),
+    validation(brandValidationSchema.addBrandSchema),
+    auth(endPointsRoles.BRAND_PERM),
     expressAsyncHandler(brandController.addBrand))
     
 router.put('/:brandId',
-    auth(endPointsRoles.BRAND_PERM),
     multerMiddleHost(allowedExtensions.image).single('image'),
+    validation(brandValidationSchema.updateBrandSchema),
+    auth(endPointsRoles.BRAND_PERM),
     expressAsyncHandler(brandController.updateBrand))
 
 router.delete('/:brandId',
+    validation(brandValidationSchema.deleteBrandSchema),
     auth(endPointsRoles.BRAND_PERM),
     expressAsyncHandler(brandController.deleteBrand))
 

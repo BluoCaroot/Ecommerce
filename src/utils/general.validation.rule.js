@@ -25,6 +25,20 @@ export const generalValidationRule = {
         'connection': Joi.string(),
         'content-length': Joi.string()
     }),
+    headersRuleOptional: Joi.object({
+        accesstoken: Joi.string(),
+        'user-agent': Joi.string().required(),
+        'postman-token': Joi.string(),
+        'content-type': Joi.string(),
+        'accept-encoding': Joi.string(),
+        'cache-control': Joi.string(),
+        'accept': Joi.string(),
+        'host': Joi.string(),
+        'accept-language': Joi.string(),
+        'cookie': Joi.string(),
+        'connection': Joi.string(),
+        'content-length': Joi.string()
+    }),
     dbId: Joi.string().custom(objectIdValidation)
 
 }

@@ -28,7 +28,6 @@ export const addSubCategory = async (req, res, next) =>
         folder: `${process.env.MAIN_FOLDER}/Categories/${category.folderId}/SubCategories/${folderId}`
     })
 
-
     const subCategory =
     {
         name,
@@ -40,8 +39,6 @@ export const addSubCategory = async (req, res, next) =>
     }
     const subCategoryCreated = await SubCategory.create(subCategory)
     req.savedDocuments = { model: SubCategory, _id: subCategory._id, method: "add"}
-
-
 
     res.status(201).json({ success: true, message: 'subCategory created successfully', data: subCategoryCreated })
 }

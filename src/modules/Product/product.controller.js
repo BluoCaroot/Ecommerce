@@ -5,6 +5,7 @@ import Product from "../../../DB/Models/product.model.js"
 import { systemRoles } from "../../utils/system-roles.js"
 import cloudinaryConnection from "../../utils/cloudinary.js"
 import generateUniqueString from "../../utils/generate-Unique-String.js"
+import { paginationFunction } from "../../utils/pagination.js"
 
 
 
@@ -26,11 +27,10 @@ export const addProduct = async (req, res, next) =>
         brand.addedBy.toString() !== addedBy.toString()
     ) return next({ cause: 403, message: 'You are not authorized to add a product to this brand' })
 
-    const slug = slugify(title, { lower: true, replacement: '-' })  //  lowercase: true
+    const slug = slugify(title, { lower: true, replacement: '-' }) 
 
-    const appliedPrice = basePrice - (basePrice * (discount || 0) / 100)
+    const appliedPrice = basePrice - (basePrice * (discount ? discount : 0) / 100)
 
-    console.log(specs)
 
     if (!req.files?.length) return next({ cause: 400, message: 'Images are required' })
     const Images = []
@@ -50,7 +50,7 @@ export const addProduct = async (req, res, next) =>
 
     const product =
     {
-        title, desc, slug, basePrice, discount, appliedPrice, stock, specs: JSON.parse(specs), categoryId, subCategoryId, brandId, addedBy, Images, folderId
+        title, desc, slug, basePrice, discount, appliedPrice, stock, specs, categoryId, subCategoryId, brandId, addedBy, Images, folderId
     }
 
     const newProduct = await Product.create(product)
@@ -61,7 +61,8 @@ export const addProduct = async (req, res, next) =>
 
 
 
-export const updateProduct = async (req, res, next) => {
+export const updateProduct = async (req, res, next) =>
+{
     const { title, desc, specs, stock, basePrice, discount, oldPublicId } = req.body
     const { productId } = req.params
     const addedBy = req.authUser._id
@@ -75,20 +76,19 @@ export const updateProduct = async (req, res, next) => {
         product.addedBy.toString() !== addedBy.toString()
     ) return next({ cause: 403, message: 'You are not authorized to update this product' })
 
-    if (title)
-    {
-        product.title = title
-        product.slug = slugify(title, { lower: true, replacement: '-' })
-    }
-    if (desc) product.desc = desc
-    if (specs) product.specs = JSON.parse(specs)
-    if (stock) product.stock = stock
+    req.savedDocuments = { model: Product, _id: product._id, method: "edit", old: product.toObject()}
+
+    product.title = title ? title : product.title
+    product.slug = title ? slugify(title, { lower: true, replacement: '-' }) : product.slug
+    product.desc = desc ? desc : product.desc
+    product.specs = specs ? specs : product.specs
+    product.stock = stock ? stock : product.stock
 
     const appliedPrice = (basePrice || product.basePrice) * (1 - ((discount || product.discount) / 100))
     product.appliedPrice = appliedPrice
 
-    if (basePrice) product.basePrice = basePrice
-    if (discount) product.discount = discount
+    product.basePrice = basePrice ? basePrice : product.basePrice
+    product.discount = discount ? discount : product.discount
 
 
     if (oldPublicId)
@@ -100,7 +100,8 @@ export const updateProduct = async (req, res, next) => {
         const newPublicId = oldPublicId.split(`${product.folderId}/`)[1]
 
 
-        const { secure_url } = await cloudinaryConnection().uploader.upload(req.file.path, {
+        const { secure_url } = await cloudinaryConnection().uploader.upload(req.file.path,
+        {
             folder: folderPath + `${product.folderId}`,
             public_id: newPublicId
         })
@@ -119,3 +120,62 @@ export const updateProduct = async (req, res, next) => {
 
     res.status(200).json({ success: true, message: 'Product updated successfully', data: product })
 }
+
+export const deleteProduct = async (req, res, next) =>
+{
+    const { productId } = req.params
+
+    const addedBy = req.authUser._id
+
+
+    const product = await Product.findById(productId)
+    if (!product) return next({ cause: 404, message: 'Product not found' })
+
+    if (
+        req.authUser.role !== systemRoles.SUPER_ADMIN &&
+        product.addedBy.toString() !== addedBy.toString()
+    ) return next({ cause: 403, message: 'You are not authorized to delete this product' })
+
+    await Product.findByIdAndDelete(productId)
+
+    res.status(200).json({ success: true, message: 'Product deleted successfully' })
+
+}
+
+export const getProduct = async (req, res, next) =>
+{
+    const { productId } = req.params
+
+    const product = await Product.findById(productId)
+
+    if (!product) return next({ cause: 404, message: 'Product not found' })
+    
+    res.status(200).json({ success: true, data: product })
+}
+
+export const getAllProducts = async (req, res, next) =>
+{
+    const { brandId, title, price, stock, size, page } = req.query
+
+    const {limit, skip } = paginationFunction({size, page})
+
+
+    const query = {}
+
+    if (title || price || stock)
+        query['$and'] = []
+
+    if (title) query['$and'].push({ title: { $regex: new RegExp("^" + title, "i")} })
+    if (price) query['$and'].push({ appliedPrice: { $lte: +price } })
+    if (stock) query['$and'].push({ stock: { $gte: +stock } })
+    if (brandId) query.brandId = {$in: brandId}
+
+    const products = await Product.find(query).limit(limit).skip(skip)
+
+    if (!products.length && (brandId || title || price || stock))
+        return next({ cause: 404, message: 'No product found' })
+        
+    res.status(200).json({ success: true, data: products })
+
+}
+

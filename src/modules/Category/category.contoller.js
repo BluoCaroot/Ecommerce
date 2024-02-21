@@ -9,7 +9,7 @@ export const addCategory = async (req, res, next) =>
 {
     const { name } = req.body
     const { _id } = req.authUser
-
+    
     const isNameDuplicated = await Category.findOne({ name })
     if (isNameDuplicated) 
         return next({ cause: 409, message: 'Category name already exists' })
@@ -94,7 +94,8 @@ export const getAllCategories = async (req, res, next) =>
         path: 'subcategories',
         populate:
         [{
-            path: 'Brands'
+            path: 'brands',
+            populate: [{ path: 'products'}]
         }]
     }])
     res.status(200).json({ success: true, message: 'Categories fetched successfully', data: categories })

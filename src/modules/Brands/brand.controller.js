@@ -113,7 +113,8 @@ export const deleteBrand = async (req, res, next) =>
     if (brand.addedBy.toString() != _id)
         return next({ cause: 403, message: 'Missing permission to delete'})
 
-        await Brand.findByIdAndDelete(brandId)
+    
+    await Brand.findByIdAndDelete(brandId)
 
     res.status(200).json({ success: true, message: 'Brand deleted successfully' })
 }

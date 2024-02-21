@@ -3,7 +3,6 @@ import mongoose, { Schema, model } from "mongoose"
 import cloudinaryConnection from "../../src/utils/cloudinary.js";
 
 
-//============================== Create the subcategory schema ==============================//
 
 const subCategorySchema = new Schema({
     name: { type: String, required: true, unique: true, trim: true },
@@ -17,13 +16,13 @@ const subCategorySchema = new Schema({
     updatedBy: { type: Schema.Types.ObjectId, ref: 'User' }, // superAdmin
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true }
 },
-    {
-        timestamps: true,
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true }
-    })
+{
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+})
 
-subCategorySchema.virtual('Brands', {
+subCategorySchema.virtual('brands', {
     ref: 'Brand',
     localField: '_id',
     foreignField: 'subCategoryId',
@@ -40,6 +39,7 @@ subCategorySchema.pre('findOneAndDelete', async function(next)
 
 
     await mongoose.models.Brand.deleteMany({ subCategoryId })
+    await mongoose.models.Product.deleteMany({ subCategoryId })
     await cloudinaryConnection().api.delete_resources_by_prefix(`${path}`)
     await cloudinaryConnection().api.delete_folder(`${path}`)
     next()

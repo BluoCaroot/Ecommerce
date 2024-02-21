@@ -3,7 +3,6 @@ import mongoose, { Schema, model } from "mongoose"
 import cloudinaryConnection from "../../src/utils/cloudinary.js";
 
 
-//============================== Create the brand schema ==============================//
 
 const brandSchema = new Schema({
     name: { type: String, required: true, trim: true },
@@ -18,10 +17,18 @@ const brandSchema = new Schema({
     subCategoryId: { type: Schema.Types.ObjectId, ref: 'SubCategory', required: true },
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true }
 },
-    {
-        timestamps: true
-    })
+{
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+})
 
+brandSchema.virtual('products',
+{
+    ref: 'Product',
+    localField: '_id',
+    foreignField: 'brandId'
+})
 
 brandSchema.pre('findOneAndDelete', async function(next)
 {
@@ -32,7 +39,7 @@ brandSchema.pre('findOneAndDelete', async function(next)
     const lastIndex = Image.public_id.lastIndexOf("/");
     const path = Image.public_id.substring(0, lastIndex);
 
-
+    await mongoose.models.Product.deleteMany({ brandId })
     await cloudinaryConnection().api.delete_resources_by_prefix(`${path}`)
     await cloudinaryConnection().api.delete_folder(`${path}`)
     
