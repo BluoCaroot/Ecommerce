@@ -1,5 +1,6 @@
 import db_connection from "../DB/connection.js"
 import { globalResponse } from "./middlewares/global-response.middleware.js"
+import { init } from "./middlewares/init.js"
 import { rollbackSavedDocuments } from "./middlewares/rollback-saved-documnets.middleware.js"
 import { rollbackUploadedFiles } from "./middlewares/rollback-uploaded-files.middleware.js"
 
@@ -14,14 +15,14 @@ export const initiateApp = (app, express) => {
     app.use(express.json())
 
     db_connection()
-
+    app.use(init)
     app.use('/auth', routers.authRouter)
     app.use('/user', routers.userRouter)
     app.use('/category', routers.categoryRouter)
     app.use('/subCategory', routers.subCategoryRouter)
     app.use('/brand', routers.brandRouter)
     app.use('/product', routers.productRouter)
-
+    app.use('/cart', routers.cartRouter)
     
     app.use(globalResponse, rollbackUploadedFiles, rollbackSavedDocuments)
 

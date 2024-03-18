@@ -38,7 +38,7 @@ export const addBrand = async (req, res, next) => {
     }
 
     const newBrand = await Brand.create(brandObject)
-    req.savedDocuments = { model: Brand, _id: newBrand._id, method: "add"}
+    req.savedDocuments.push({ model: Brand, _id: newBrand._id, method: "add"})
 
 
 
@@ -63,7 +63,7 @@ export const updateBrand = async (req, res, next) =>
     if (brand.addedBy.toString() != _id && role != 'superAdmin')
         return next({ cause: 403, message: 'Missing permission to edit'})
 
-    req.savedDocuments = { model: Brand, _id: brand._id, method: "edit", old: brand.toObject()}
+    req.savedDocuments.push({ model: Brand, _id: brand._id, method: "edit", old: brand.toObject()})
 
     if (name) 
     {

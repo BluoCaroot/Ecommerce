@@ -29,7 +29,7 @@ export const signUp = async (req, res, next) => {
 
 
     const newUser = await User.create({ username, email, password: hashedPassword, age, phoneNumbers, addresses })
-    req.savedDocuments = { model: User, _id: newUser._id, method: "add"}
+    req.savedDocuments.push({ model: User, _id: newUser._id, method: "add"})
 
     res.status(201).json(
     {

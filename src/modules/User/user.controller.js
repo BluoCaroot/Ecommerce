@@ -11,7 +11,7 @@ export const updateUser = async (req, res, next) =>
 
     const user = await User.findById(authUser._id)
 
-    req.savedDocuments = { model: User, _id: user._id, method: "edit", old: user.toObject()}
+    req.savedDocuments.push({ model: User, _id: user._id, method: "edit", old: user.toObject()})
 
     user.username = username ? username : user.username
     user.age = age ? age : user.age
@@ -45,8 +45,7 @@ export const changeEmail = async (req, res, next) =>
     if (isEmailDuplicated)
         return next(new Error('Email already exists, Please use another email', { cause: 409 }))
     
-    req.savedDocuments = { model: User, _id: user._id, method: "edit", old: user.toObject}
-
+    req.savedDocuments.push({ model: User, _id: user._id, method: "edit", old: user.toObject})
     user.email = email
     user.isEmailVerified = false
     await user.save()
@@ -87,7 +86,7 @@ export const changePassword = async (req, res, next) =>
     if (password == oldPassword) 
         return next({ cause: 400, message: 'Please enter different password from the existing one.' })
 
-    req.savedDocuments = { model: User, _id: user._id, method: "edit", old: user.toObject()}
+    req.savedDocuments.push({ model: User, _id: user._id, method: "edit", old: user.toObject()})
     
     user.password = bcrypt.hashSync(password, +process.env.SALT_ROUNDS)
     await user.save()

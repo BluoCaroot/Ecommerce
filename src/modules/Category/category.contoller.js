@@ -34,7 +34,7 @@ export const addCategory = async (req, res, next) =>
         addedBy: _id
     }
     const categoryCreated = await Category.create(category)
-    req.savedDocuments = { model: Category, _id: categoryCreated._id, method: "add"}
+    req.savedDocuments.push({ model: Category, _id: categoryCreated._id, method: "add"})
 
     res.status(201).json({ success: true, message: 'Category created successfully', data: categoryCreated })
 }
@@ -51,7 +51,7 @@ export const updateCategory = async (req, res, next) =>
 
    
 
-    req.savedDocuments = { model: Category, _id: category._id, method: "edit", old: category.toObject()}
+    req.savedDocuments.push({ model: Category, _id: category._id, method: "edit", old: category.toObject()})
     
     if (name) 
     {

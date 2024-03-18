@@ -10,7 +10,7 @@ export const addSubCategorySchema =
     }),
     params: Joi.object(
     {
-        CategoryId: generalValidationRule.dbId.required()
+        categoryId: generalValidationRule.dbId.required()
     }),
     headers: generalValidationRule.headersRule
 }

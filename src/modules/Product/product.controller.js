@@ -54,7 +54,7 @@ export const addProduct = async (req, res, next) =>
     }
 
     const newProduct = await Product.create(product)
-    req.savedDocuments = { model: Product, _id: newProduct._id }
+    req.savedDocuments.push({ model: Product, _id: newProduct._id })
 
     res.status(201).json({ success: true, message: 'Product created successfully', data: newProduct })
 }
@@ -76,7 +76,7 @@ export const updateProduct = async (req, res, next) =>
         product.addedBy.toString() !== addedBy.toString()
     ) return next({ cause: 403, message: 'You are not authorized to update this product' })
 
-    req.savedDocuments = { model: Product, _id: product._id, method: "edit", old: product.toObject()}
+    req.savedDocuments.push({ model: Product, _id: product._id, method: "edit", old: product.toObject()})
 
     product.title = title ? title : product.title
     product.slug = title ? slugify(title, { lower: true, replacement: '-' }) : product.slug
