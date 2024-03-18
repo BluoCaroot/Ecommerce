@@ -23,7 +23,8 @@ export const initiateApp = (app, express) => {
     app.use('/brand', routers.brandRouter)
     app.use('/product', routers.productRouter)
     app.use('/cart', routers.cartRouter)
-    
+    app.use('/coupon', routers.couponRouter)
+
     app.use(globalResponse, rollbackUploadedFiles, rollbackSavedDocuments)
 
     app.listen(port, () => console.log(`server started on port ${port}`))

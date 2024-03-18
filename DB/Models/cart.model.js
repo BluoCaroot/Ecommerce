@@ -56,7 +56,7 @@ cartSchema.pre('save', async function(next)
     }
     cart.subTotal = total;
     next()
-})
+}, {timestamps: true})
 
 
 export default mongoose.models.Cart || mongoose.model('Cart', cartSchema)

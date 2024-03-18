@@ -23,10 +23,10 @@ async function rollback({model, _id, method, old})
 
 export const rollbackSavedDocuments = async (req, res, next) =>
 {
-
+    console.log("roll back")
     if (req.savedDocuments?.length)
     {
-        for (document of req.savedDocuments)
+        for (const document of req.savedDocuments)
         {
             const { model, _id , method, old} = document
             rollback({ model, _id , method, old})

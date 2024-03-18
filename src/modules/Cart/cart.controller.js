@@ -38,8 +38,9 @@ export const addProductToCart = async (req, res, next) =>
             }],
             subTotal: doesProductExist.appliedPrice * quantity
         }
-        console.log(cartObj)
         const newCart = await Cart.create(cartObj);
+        if (!newCart)
+            return (next({cause: 400, message: 'Product not added to cart'}));
         req.savedDocuments.push({model: Cart, _id: newCart._id, method: 'add'});
         return res.status(201).json({message: "Product added to cart successfully", data: newCart});
     }
@@ -60,6 +61,7 @@ export const addProductToCart = async (req, res, next) =>
         productId, 
         quantity,
         basePrice: doesProductExist.appliedPrice,
+        finalPrice: doesProductExist.appliedPrice * quantity,
         title: doesProductExist.title
     })
     const productAdded = await userCart.save()
