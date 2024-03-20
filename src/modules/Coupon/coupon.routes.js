@@ -10,19 +10,24 @@ import { endpointsRoles } from "./coupon.endpoints.js"
 const router = Router();
 
 router.post('/' , 
-    auth(endpointsRoles.ADD_COUPOUN) ,
     validation(couponValidationSchemas.addCouponSchema),
+    auth(endpointsRoles.ADD_COUPOUN) ,
     expressAsyncHandler(couponController.addCoupon))
 
 router.put('/:couponId' ,
-    auth(endpointsRoles.ADD_COUPOUN),
     validation(couponValidationSchemas.updateCouponSchema),
+    auth(endpointsRoles.ADD_COUPOUN),
     expressAsyncHandler(couponController.updateCoupon))
 
 router.get('/' ,
-    auth(endpointsRoles.ADD_COUPOUN),
     validation(couponValidationSchemas.getCouponsSchema),
+    auth(endpointsRoles.ADD_COUPOUN),
     expressAsyncHandler(couponController.getCoupons))
+
+router.put('/toggle/:couponId' ,
+    validation(couponValidationSchemas.toggleCouponSchema),
+    auth(endpointsRoles.ADD_COUPOUN),
+    expressAsyncHandler(couponController.toggleCoupon))
 
 
 export default router;

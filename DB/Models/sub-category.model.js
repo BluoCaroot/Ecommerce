@@ -1,6 +1,5 @@
 import mongoose, { Schema, model } from "mongoose"
 
-import cloudinaryConnection from "../../src/utils/cloudinary.js";
 
 
 
@@ -12,9 +11,15 @@ const subCategorySchema = new Schema({
         public_id: { type: String, required: true, unique: true }
     },
     folderId: { type: String, required: true, unique: true },
-    addedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },  // superAdmin
-    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' }, // superAdmin
-    categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true }
+    addedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },  
+    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' }, 
+    deletedBy: { type: Schema.Types.ObjectId, ref: 'User' }, 
+    categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+
+    isDeleted: { type: Boolean, default: false },
+    imagesDeleted: { type: Boolean, default: false }
+
+
 },
 {
     timestamps: true,
@@ -28,20 +33,4 @@ subCategorySchema.virtual('brands', {
     foreignField: 'subCategoryId',
 })
 
-subCategorySchema.pre('findOneAndDelete', async function(next)
-{
-    const conditions = this.getQuery(); 
-    const subCategoryId = conditions._id;
-    const { Image } = await mongoose.models.SubCategory.findById(subCategoryId)
-
-    const lastIndex = Image.public_id.lastIndexOf("/");
-    const path = Image.public_id.substring(0, lastIndex);
-
-
-    await mongoose.models.Brand.deleteMany({ subCategoryId })
-    await mongoose.models.Product.deleteMany({ subCategoryId })
-    await cloudinaryConnection().api.delete_resources_by_prefix(`${path}`)
-    await cloudinaryConnection().api.delete_folder(`${path}`)
-    next()
-})
 export default mongoose.models.SubCategory || model('SubCategory', subCategorySchema)

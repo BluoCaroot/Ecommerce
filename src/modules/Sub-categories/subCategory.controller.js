@@ -4,6 +4,7 @@ import SubCategory from "../../../DB/Models/sub-category.model.js"
 import Category from '../../../DB/Models/category.model.js'
 import generateUniqueString from "../../utils/generate-Unique-String.js"
 import cloudinaryConnection from "../../utils/cloudinary.js"
+import * as deletion from "../../utils/deletion.js"
 
 export const addSubCategory = async (req, res, next) =>
 {
@@ -92,14 +93,15 @@ export const updateSubCategory = async (req, res, next) =>
 export const deleteSubCategory = async (req, res, next) =>
 {
     const { subCategoryId } = req.params
+    const {_id} = req.authUser
 
     const subCategory = await SubCategory.findById(subCategoryId)
     if (!subCategory) 
         return next({ cause: 404, message: 'subCategory not found' })
 
-   
-        await SubCategory.findByIdAndDelete(subCategoryId)
-
+    const subCategoryDeleted = await deletion.deleteSubCategory({subCategoryId, req, _id})
+    if (!subCategoryDeleted) 
+        return next({ cause: 500, message: 'Error deleting subCategory' })
     res.status(200).json({ success: true, message: 'Category deleted successfully' })
 }
 

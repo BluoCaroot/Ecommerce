@@ -6,7 +6,7 @@ import { systemRoles } from "../../utils/system-roles.js"
 import cloudinaryConnection from "../../utils/cloudinary.js"
 import generateUniqueString from "../../utils/generate-Unique-String.js"
 import { paginationFunction } from "../../utils/pagination.js"
-
+import * as deletion from "../../utils/deletion.js"
 
 
 export const addProduct = async (req, res, next) =>
@@ -115,7 +115,6 @@ export const updateProduct = async (req, res, next) =>
         req.folder = folderPath + `${product.folderId}`
     }
 
-
     await product.save()
 
     res.status(200).json({ success: true, message: 'Product updated successfully', data: product })
@@ -136,8 +135,8 @@ export const deleteProduct = async (req, res, next) =>
         product.addedBy.toString() !== addedBy.toString()
     ) return next({ cause: 403, message: 'You are not authorized to delete this product' })
 
-    await Product.findByIdAndDelete(productId)
-
+    const productDeleted = await deletion.deleteProduct({productId, req, addedBy})
+    if (!productDeleted) return next({ cause: 500, message: 'Failed to delete product' })
     res.status(200).json({ success: true, message: 'Product deleted successfully' })
 
 }

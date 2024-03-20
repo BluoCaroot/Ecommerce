@@ -111,24 +111,29 @@ export const updateCoupon = async (req, res, next) =>
 /**
  * 
  * @param {*} params { id }  
- * @returns { message: "Coupon deleted successfully" }
- * @description deletes coupon
+ * @returns { message: "Coupon toggeled successfully" }
+ * @description disables / enables coupon
  * 
  */
-export const deleteCoupon = async (req, res, next) =>
+export const toggleCoupon = async (req, res, next) =>
 {
-    const { id } = req.params;
+    const { couponId } = req.params;
+    const {_id} = req.authUser
     const coupon = await Coupon.findById(id);
 
     if (!coupon)
         return (next({cause: 400, message: 'Coupon not found'}));
 
-    req.savedDocuments.push({model: Coupon, _id: coupon._id, method: 'delete'});
-    const deletedCoupon = await Coupon.findByIdAndDelete(id);
-    if (!deletedCoupon)
-        return (next({cause: 500, message: 'Error deleting coupon'}));
+    coupon.status = coupon.status === 'valid' ? 'expired' : 'valid';
+    if (coupon.status === 'valid')
+        coupon.enabledBy = _id;
+    else
+        coupon.disabledBy = _id;
+    const toggeledCoupon = await coupon.save();
+    if (!toggeledCoupon)
+        return (next({cause: 500, message: 'Error toggeling coupon'}));
 
-    res.status(200).json({message: 'Coupon deleted successfully'});
+    res.status(200).json({message: 'Coupon toggeled successfully'});
 }
 
 /**

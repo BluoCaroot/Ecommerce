@@ -4,7 +4,7 @@ import Brand from '../../../DB/Models/brand.model.js'
 import subCategory from '../../../DB/Models/sub-category.model.js'
 import cloudinaryConnection from '../../utils/cloudinary.js'
 import generateUniqueString from '../../utils/generate-Unique-String.js'
-
+import * as deletion from '../../utils/deletion.js'
 
 export const addBrand = async (req, res, next) => {
     const { name } = req.body
@@ -113,9 +113,9 @@ export const deleteBrand = async (req, res, next) =>
     if (brand.addedBy.toString() != _id)
         return next({ cause: 403, message: 'Missing permission to delete'})
 
-    
-    await Brand.findByIdAndDelete(brandId)
-
+    const brandDeleted = await deletion.deleteBrand(brandId, req, _id)
+    if (!brandDeleted) 
+        return next({ cause: 500, message: 'Failed to delete brand' })
     res.status(200).json({ success: true, message: 'Brand deleted successfully' })
 }
 

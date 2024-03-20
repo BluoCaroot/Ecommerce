@@ -42,7 +42,13 @@ const cartSchema = new mongoose.Schema(
     {
         type: Number,
         required: true,
-    }
+    },
+}
+,
+{
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 })
 
 cartSchema.pre('save', async function(next)

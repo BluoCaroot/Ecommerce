@@ -3,6 +3,7 @@ import jwt  from 'jsonwebtoken'
 
 import User from "../../../DB/Models/user.model.js"
 import sendEmailService from '../../services/send-email.service.js'
+import * as deletion from '../../utils/deletion.js'
 
 export const updateUser = async (req, res, next) =>
 {
@@ -107,8 +108,10 @@ export const deleteUser = async (req, res, next) =>
     
     if (!isPasswordCorrect)
         return next(new Error('Incorrect password', {cause: 400}))
-        
-    await User.findByIdAndDelete(authUser._id)
+    
+    const userDeleted = await deletion.deleteUser({userId: user._id, req})
+    if (!userDeleted) 
+        return next(new Error('Error deleting user', {cause: 500}))
     res.status(200).json(
     {
         success: true,

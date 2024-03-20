@@ -5,6 +5,8 @@ import User from "../../../DB/Models/user.model.js"
 import sendEmailService from "../../services/send-email.service.js"
 
 
+
+
 export const signUp = async (req, res, next) => {
     const { username, email, password, age, phoneNumbers, addresses } = req.body
 
@@ -19,7 +21,7 @@ export const signUp = async (req, res, next) => {
         to: email,
         subject: 'Email Verification',
         message: `<h2>please click on this link to verfiy your email</h2>
-        <a href="http://localhost:3000/auth/verify-email?token=${usertoken}">Verify Email</a>`
+        <a href="${req.protocol}://${req.headers.host}/auth/verify-email?token=${usertoken}">Verify Email</a>`
     })
 
     if (!isEmailSent) 
@@ -49,14 +51,16 @@ export const verifyEmail = async (req, res, next) =>
 
     const decodedData = jwt.verify(token, process.env.JWT_SECRET_VERFICATION)
 
-    const user = await User.findOneAndUpdate(
-    {
-        email: decodedData.email,
-        isEmailVerified: false
-    },{ isEmailVerified: true })
-
+    const user = await User.findOne({ email: decodedData.email, isEmailVerified: false })
     if (!user)
         return next(new Error('User not found', { cause: 404 }))
+
+    req.savedDocuments.push({ model: User, _id: user._id, method: "update", old: user.toObject()})
+
+    user.isEmailVerified = true
+    const updatedUser = await user.save()
+    if (!updatedUser)
+        return next(new Error('An error occured, please try again later', { cause: 500 }))
 
     res.status(200).json({
         success: true,
@@ -82,8 +86,6 @@ export const signIn = async (req, res, next) =>
 
     const token = jwt.sign({ email, id: user._id, loggedIn: true }, process.env.JWT_SECRET_LOGIN, { expiresIn: '1d' })
 
-    user.isLoggedIn = true
-    await user.save()
 
     res.status(200).json(
     {

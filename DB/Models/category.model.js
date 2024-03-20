@@ -1,6 +1,5 @@
 import mongoose, { Schema, model } from "mongoose"
 
-import cloudinaryConnection from "../../src/utils/cloudinary.js"
 
 
 const categorySchema = new Schema(
@@ -12,8 +11,12 @@ const categorySchema = new Schema(
         public_id: { type: String, required: true, unique: true }
     },
     folderId: { type: String, required: true, unique: true },
-    addedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },  // superAdmin
-    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' }, // superAdmin
+    addedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },  
+    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' }, 
+    deletedBy: { type: Schema.Types.ObjectId, ref: 'User' }, 
+    isDeleted: { type: Boolean, default: false },
+    imagesDeleted: { type: Boolean, default: false }
+
 },
 {
     timestamps: true,
@@ -27,20 +30,6 @@ categorySchema.virtual('subcategories',
     localField: '_id',
     foreignField: 'categoryId',
     
-})
-
-categorySchema.pre('findOneAndDelete', async function(next)
-{
-    const conditions = this.getQuery(); 
-    const categoryId = conditions._id;
-    const {folderId} = await mongoose.models.Category.findById(categoryId)
-    
-    await mongoose.models.SubCategory.deleteMany({ categoryId })
-    await mongoose.models.Brand.deleteMany({ categoryId })
-    await mongoose.models.Product.deleteMany({ categoryId })
-    await cloudinaryConnection().api.delete_resources_by_prefix(`${process.env.MAIN_FOLDER}/Categories/${folderId}`)
-    await cloudinaryConnection().api.delete_folder(`${process.env.MAIN_FOLDER}/Categories/${folderId}`)
-    next()
 })
 
 

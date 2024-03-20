@@ -3,6 +3,7 @@ import slugify from 'slugify'
 import Category from '../../../DB/Models/category.model.js'
 import cloudinaryConnection from '../../utils/cloudinary.js'
 import generateUniqueString from '../../utils/generate-Unique-String.js'
+import * as deletion from '../../utils/deletion.js'
 
 
 export const addCategory = async (req, res, next) =>
@@ -34,6 +35,7 @@ export const addCategory = async (req, res, next) =>
         addedBy: _id
     }
     const categoryCreated = await Category.create(category)
+    if (!categoryCreated) return next({ cause: 500, message: 'Failed to create category' })
     req.savedDocuments.push({ model: Category, _id: categoryCreated._id, method: "add"})
 
     res.status(201).json({ success: true, message: 'Category created successfully', data: categoryCreated })
@@ -104,12 +106,14 @@ export const getAllCategories = async (req, res, next) =>
 export const deleteCategory = async (req, res, next) =>
 {
     const { categoryId } = req.params
+    const { _id } = req.authUser
 
     const category = await Category.findById(categoryId)
     if (!category) 
         return next({ cause: 404, message: 'Category not found' })
 
-   
-    await Category.findByIdAndDelete(categoryId)
+    const categoryDeleted = await deletion.deleteCategory({categoryId, req, _id})
+    if (!categoryDeleted) 
+        return next({ cause: 500, message: 'Failed to delete category' })
     res.status(200).json({ success: true, message: 'Category deleted successfully' })
 }

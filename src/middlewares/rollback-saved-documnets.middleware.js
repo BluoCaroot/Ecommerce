@@ -10,7 +10,7 @@ async function rollback({model, _id, method, old})
             await model.findByIdAndUpdate(_id, old)
             break
         case ("delete"):
-            await model.create(old)
+            await model.findByIdAndUpdate(_id, { isDeleted: false })
             break
     }
 }
@@ -23,7 +23,6 @@ async function rollback({model, _id, method, old})
 
 export const rollbackSavedDocuments = async (req, res, next) =>
 {
-    console.log("roll back")
     if (req.savedDocuments?.length)
     {
         for (const document of req.savedDocuments)

@@ -7,8 +7,9 @@ import subCategoryRouter from './Sub-categories/subCategory.routes.js'
 import brandRouter from  './Brands/brand.routes.js'
 import productRouter from  './Product/product.routes.js'
 import cartRouter from './Cart/cart.routes.js'
-import couponRouter from './Coupon/coupon.router.js'
-
+import couponRouter from './Coupon/coupon.routes.js'
+import orderRouter from './Order/order.routes.js'
+ 
 
 export {
     userRouter,
@@ -18,7 +19,8 @@ export {
     brandRouter,
     productRouter,
     cartRouter,
-    couponRouter
+    couponRouter,
+    orderRouter
 }
 
 /**

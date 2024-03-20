@@ -12,5 +12,5 @@ initiateApp(app, express)
 
 
 /**
- * @todo crons, payment, order module, social login, invoice, 
+ * @todo crons, payment, social login, invoice
  */

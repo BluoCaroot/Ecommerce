@@ -49,3 +49,11 @@ export const getCouponsSchema =
         id: generalValidationRule.dbId
     }).xor('type', 'id')
 }
+export const toggleCouponSchema =
+{
+    params: Joi.object(
+    {
+        couponId: generalValidationRule.dbId.required()
+    }),
+    headers: generalValidationRule.headersRule
+}

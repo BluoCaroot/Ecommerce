@@ -1,7 +1,6 @@
 
 import mongoose, { Schema, model } from "mongoose";
 import { systemRoles } from "../../src/utils/system-roles.js";
-import cloudinaryConnection from "../../src/utils/cloudinary.js";
 
 const userSchema = new Schema(
 {
@@ -41,7 +40,7 @@ const userSchema = new Schema(
     role:
     {
         type: String,
-        enum: [systemRoles.USER, systemRoles.ADMIN, systemRoles.SUPER_ADMIN],
+        enum: [systemRoles.USER, systemRoles.ADMIN, systemRoles.SUPER_ADMIN, systemRoles.DELIVERY_PERSON],
         default: systemRoles.USER
     },
     isEmailVerified:
@@ -55,11 +54,8 @@ const userSchema = new Schema(
         min: 18,
         max: 100
     },
-    isLoggedIn:
-    {
-        type: Boolean,
-        default: false
-    }
+    isDeleted: { type: Boolean, default: false }
+
 }, { timestamps: true })
 
 

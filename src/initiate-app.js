@@ -5,7 +5,7 @@ import { rollbackSavedDocuments } from "./middlewares/rollback-saved-documnets.m
 import { rollbackUploadedFiles } from "./middlewares/rollback-uploaded-files.middleware.js"
 
 import * as  routers from './modules/index.routes.js'
-import { detectExpiredCoupons } from "./utils/crons.js"
+import { detectExpiredCoupons, detectUnconfirmedOrders } from "./utils/crons.js"
 
 
 export const initiateApp = (app, express) => {
@@ -25,10 +25,12 @@ export const initiateApp = (app, express) => {
     app.use('/product', routers.productRouter)
     app.use('/cart', routers.cartRouter)
     app.use('/coupon', routers.couponRouter)
+    app.use('/order', routers.orderRouter)
 
     app.use(globalResponse, rollbackUploadedFiles, rollbackSavedDocuments)
 
     detectExpiredCoupons()
+    detectUnconfirmedOrders()
     app.listen(port, () => console.log(`server started on port ${port}`))
 
 }

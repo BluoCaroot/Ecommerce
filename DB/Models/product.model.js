@@ -10,7 +10,7 @@ const productSchema = new Schema({
     basePrice: { type: Number, required: true },
     discount: { type: Number, default: 0 },
     appliedPrice: { type: Number, required: true },
-    stock: { type: Number, required: true, min: 1 },
+    stock: { type: Number, required: true, min: 0 },
     rate: { type: Number, default: 0, min: 0, max: 5 },
 
     Images: [{
@@ -24,10 +24,14 @@ const productSchema = new Schema({
     },
 
     addedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    deletedBy: { type: Schema.Types.ObjectId, ref: 'User' },
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     subCategoryId: { type: Schema.Types.ObjectId, ref: 'SubCategory', required: true },
     brandId: { type: Schema.Types.ObjectId, ref: 'Brand', required: true },
+
+    isDeleted: { type: Boolean, default: false },
+    imagesDeleted: { type: Boolean, default: false }
+
 
 },
 {
@@ -37,20 +41,6 @@ const productSchema = new Schema({
 });
 
 
-productSchema.pre('findOneAndDelete', async function(next)
-{
-    const conditions = this.getQuery(); 
-    const productId = conditions._id;
-    const { Image } = await mongoose.models.Product.findById(productId)
-
-    const lastIndex = Image.public_id.lastIndexOf("/");
-    const path = Image.public_id.substring(0, lastIndex);
-
-
-    await cloudinaryConnection().api.delete_resources_by_prefix(`${path}`)
-    await cloudinaryConnection().api.delete_folder(`${path}`)
-    next()
-})
 
 
 export default mongoose.models.Product || model('Product', productSchema)
