@@ -20,15 +20,21 @@ export async function deleteBrand({brandId, req, _id})
         return false
     const products = await Product.find({ brandId})
     for (const product of products)
-        ret &&= await delteProduct(product._id, req)
+        ret &&= await delteProduct({productId:product._id, req, _id})
     return ret
 }
 
 export async function deleteSubCategory({subCategoryId, req, _id})
 {
+    let ret = true
     req.savedDocuments.push({ model: SubCategory, _id: subCategory._id, method: "delete"})
     const subCategory = await SubCategory.findByIdAndUpdate(subCategoryId, { isDeleted: true, deletedBy: _id})
-    return subCategory ? true : false
+    if (!subCategory) 
+        return false
+    const brands = await Brand.find({ subCategoryId})
+    for (const brand of brands)
+        ret &&= await deleteBrand({brandId:brand._id, req, _id})
+    return ret
 }
 
 export async function deleteCategory({categoryId, req, _id})
@@ -40,7 +46,7 @@ export async function deleteCategory({categoryId, req, _id})
         return false
     const subCategories = await SubCategory.find({ categoryId})
     for (const subCategory of subCategories)
-        ret &&= await deleteSubCategory(subCategory._id, req)
+        ret &&= await deleteSubCategory({subCategoryId: subCategory._id, req, _id})
     return ret
 }
 

@@ -3,7 +3,11 @@ import { DateTime } from "luxon"
 
 import Order from "../../DB/Models/order.model.js"
 import Coupon from "../../DB/Models/coupon.model.js"
-
+import Product from "../../DB/Models/product.model.js"
+import Brand from "../../DB/Models/brand.model.js"
+import SubCategory from "../../DB/Models/sub-category.model.js"
+import Category from "../../DB/Models/category.model.js"
+import cloudinaryConnection from "./cloudinary.js"
 
 export function detectExpiredCoupons()
 {
@@ -33,6 +37,61 @@ export function detectUnconfirmedOrders()
                 order.orderStatus = "Cancelled"
                 await order.save()
             }
+        }
+    })
+}
+
+export function DeleteOldImages()
+{
+    scheduleJob("* * * 1 *", async () =>
+    {
+        const products = await Product.find({isDeleted: true, imagesDeleted: false})
+        for (const product of products)
+        {
+            if (DateTime.fromISO(product.deletedAt) > DateTime.now().minus({days: 30}))
+                continue;
+            const {folderId} = product
+            const folderPath = product.Images[0].public_id.split(`${folderId}/`)[0] + folderId
+            await cloudinaryConnection().api.delete_resources_by_prefix(folderPath)
+            await cloudinaryConnection().api.delete_folder(folderPath)
+            product.imagesDeleted = true
+            await product.save()
+        }   
+        const brands = await Brand.find({isDeleted: true, imagesDeleted: false})
+        for (const brand of brands)
+        {
+            if (DateTime.fromISO(brand.deletedAt) > DateTime.now().minus({days: 30}))
+                continue;
+            const {folderId} = brand
+            const folderPath = brand.Image.public_id.split(`${folderId}/`)[0] + folderId
+            await cloudinaryConnection().api.delete_resources_by_prefix(folderPath)
+            await cloudinaryConnection().api.delete_folder(folderPath)
+            brand.imagesDeleted = true
+            await brand.save()
+        }
+        const subCategories = await SubCategory.find({isDeleted: true, imagesDeleted: false})
+        for (const subCategory of subCategories)
+        {
+            if (DateTime.fromISO(subCategory.deletedAt) > DateTime.now().minus({days: 30}))
+                continue;
+            const {folderId} = subCategory
+            const folderPath = subCategory.Image.public_id.split(`${folderId}/`)[0] + folderId
+            await cloudinaryConnection().api.delete_resources_by_prefix(folderPath)
+            await cloudinaryConnection().api.delete_folder(folderPath)
+            subCategory.imagesDeleted = true
+            await subCategory.save()
+        }
+        const categories = await Category.find({isDeleted: true, imagesDeleted: false})
+        for (const category of categories)
+        {
+            if (DateTime.fromISO(category.deletedAt) > DateTime.now().minus({days: 30}))
+                continue;
+            const {folderId} = category
+            const folderPath = category.Image.public_id.split(`${folderId}/`)[0] + folderId
+            await cloudinaryConnection().api.delete_resources_by_prefix(folderPath)
+            await cloudinaryConnection().api.delete_folder(folderPath)
+            category.imagesDeleted = true
+            await category.save()
         }
     })
 }

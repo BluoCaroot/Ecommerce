@@ -110,7 +110,7 @@ export const deleteBrand = async (req, res, next) =>
     if (!brand) 
         return next({ cause: 404, message: 'Brand not found' })
 
-    if (brand.addedBy.toString() != _id)
+    if (brand.addedBy.toString() !== _id.toString() && role !== systemRoles.SUPER_ADMIN)
         return next({ cause: 403, message: 'Missing permission to delete'})
 
     const brandDeleted = await deletion.deleteBrand(brandId, req, _id)
