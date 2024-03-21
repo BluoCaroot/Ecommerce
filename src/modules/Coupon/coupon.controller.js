@@ -103,7 +103,7 @@ export const updateCoupon = async (req, res, next) =>
     const updatedCoupon = await coupon.save();
     if (!updatedCoupon)
         return (next({cause: 500, message: 'Error updating coupon'}));
-    res.status(200).json({message: "Coupon updated successfully", data: updatedCoupon});
+    res.status(200).json({success: true, message: "Coupon updated successfully", data: updatedCoupon});
 
 }
 
@@ -133,7 +133,7 @@ export const toggleCoupon = async (req, res, next) =>
     if (!toggeledCoupon)
         return (next({cause: 500, message: 'Error toggeling coupon'}));
 
-    res.status(200).json({message: 'Coupon toggeled successfully'});
+    res.status(200).json({success: true, message: 'Coupon toggeled successfully'});
 }
 
 /**
@@ -153,11 +153,11 @@ export const getCoupons = async (req, res, next) =>
         const coupon = await Coupon.findById(id);
         if (!coupon)
             return (next({cause: 400, message: 'Coupon not found'}));
-        res.status(200).json({message: 'Coupon found', data: coupon});
+        return res.status(200).json({success: true, message: 'Coupon found', data: coupon});
     }
 
     const coupons = await Coupon.find({status: type});
     if (!coupons)
         return (next({cause: 500, message: 'Error fetching coupons'}));
-    res.status(200).json({message: `list of ${type} coupons`, data: coupons});
+    res.status(200).json({success: true, message: `list of ${type} coupons`, data: coupons});
 }

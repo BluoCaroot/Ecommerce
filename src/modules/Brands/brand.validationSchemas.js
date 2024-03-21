@@ -43,3 +43,13 @@ export const deleteBrandSchema =
     }),
     headers: generalValidationRule.headersRule
 }
+
+export const getBrandsSchema =
+{
+    query: Joi.object(
+    {
+        categoryId: generalValidationRule.dbId,
+        subCategoryId: generalValidationRule.dbId
+    }).oxor('categoryId', 'subCategoryId'),
+    headers: generalValidationRule.headersRule
+}

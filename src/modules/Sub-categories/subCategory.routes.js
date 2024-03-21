@@ -33,4 +33,8 @@ router.delete('/:subCategoryId',
 router.get('/', 
     expressAsyncHandler(subCategoryController.getSubCategoriesWithBrands))
 
+router.get('/:subCategoryId',
+    validation(subCategoryValidationSchema.getSubCategorySchema),
+    expressAsyncHandler(subCategoryController.getSubCategory))
+
 export default router;

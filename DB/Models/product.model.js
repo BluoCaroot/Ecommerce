@@ -12,6 +12,7 @@ const productSchema = new Schema({
     appliedPrice: { type: Number, required: true },
     stock: { type: Number, required: true, min: 0 },
     rate: { type: Number, default: 0, min: 0, max: 5 },
+    reviewsCount: { type: Number, default: 0 },
 
     Images: [{
         secure_url: { type: String, required: true },
@@ -40,7 +41,12 @@ const productSchema = new Schema({
     toObject: { virtuals: true }
 });
 
-
+productSchema.virtual('reviews', 
+{
+    ref: 'Review',
+    localField: '_id',
+    foreignField: 'productId'
+})
 
 
 export default mongoose.models.Product || model('Product', productSchema)

@@ -42,7 +42,7 @@ export const addProductToCart = async (req, res, next) =>
         if (!newCart)
             return (next({cause: 400, message: 'Product not added to cart'}));
         req.savedDocuments.push({model: Cart, _id: newCart._id, method: 'add'});
-        return res.status(201).json({message: "Product added to cart successfully", data: newCart});
+        return res.status(201).json({success: true, message: "Product added to cart successfully", data: newCart});
     }
 
     req.savedDocuments.push({model: Cart, _id: userCart._id, method: 'edit', old: userCart.toObject()});
@@ -98,6 +98,6 @@ export const removeProductFromCart = async (req, res, next) =>
         await Cart.findByIdAndDelete(userCart._id);
     }
 
-    return res.status(200).json({message: 'Product removed from cart successfully'});
+    return res.status(200).json({success: true, message: 'Product removed from cart successfully'});
 
 }

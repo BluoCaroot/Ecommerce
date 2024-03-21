@@ -146,6 +146,7 @@ export const getProduct = async (req, res, next) =>
     const { productId } = req.params
 
     const product = await Product.findById(productId)
+                    .populate([{ path: 'reviews' }])
 
     if (!product) return next({ cause: 404, message: 'Product not found' })
     
@@ -169,7 +170,9 @@ export const getAllProducts = async (req, res, next) =>
     if (stock) query['$and'].push({ stock: { $gte: +stock } })
     if (brandId) query.brandId = {$in: brandId}
 
-    const products = await Product.find(query).limit(limit).skip(skip)
+    const products = await Product.find(query)
+                    .populate([{ path: 'reviews' }])
+                    .limit(limit).skip(skip)
 
     if (!products.length && (brandId || title || price || stock))
         return next({ cause: 404, message: 'No product found' })
@@ -177,4 +180,5 @@ export const getAllProducts = async (req, res, next) =>
     res.status(200).json({ success: true, data: products })
 
 }
+
 

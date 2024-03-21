@@ -26,6 +26,7 @@ export const couponValidation = async (couponCode , userId) =>{
 
 export const applyCoupon = (coupon, totalPrice) =>
 {
+    if (!coupon) return totalPrice;
     const {isFixed, isPercentage, couponAmount} = coupon;
 
     if (isFixed && couponAmount > totalPrice)

@@ -12,6 +12,14 @@ export const addCategorySchema =
     headers: generalValidationRule.headersRule
 }
 
+export const getCategorySchema = 
+{
+    params: Joi.object(
+    {
+        categoryId: generalValidationRule.dbId.required()
+    })
+}
+
 export const updateCategorySchema = 
 {
     body: Joi.object(
@@ -24,6 +32,14 @@ export const updateCategorySchema =
         categoryId: generalValidationRule.dbId.required()
     }),
     headers: generalValidationRule.headersRule
+}
+
+export const getSubcategoriesSchema = 
+{
+    params: Joi.object(
+    {
+        categoryId: generalValidationRule.dbId.required()
+    })
 }
 
 export const deleteCategorySchema = 

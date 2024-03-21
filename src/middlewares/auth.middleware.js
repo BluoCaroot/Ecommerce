@@ -36,8 +36,7 @@ export const auth = (accessRoles, require = true) =>
         } 
         catch (error) 
         {
-            console.log(error);
-            next(new Error('catch error in auth middleware', { cause: 500 }))
+            
         }
     }
 }

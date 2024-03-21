@@ -25,6 +25,12 @@ router.put('/:categoryId',
     expressAsyncHandler(categoryController.updateCategory))
 
 router.get('/', expressAsyncHandler(categoryController.getAllCategories))
+router.get('/:categoryId',
+    validation(categoryValidationSchema.getCategorySchema),
+    expressAsyncHandler(categoryController.getCategory))
+router.get('/subCategories/:categoryId',
+    validation(categoryValidationSchema.getSubcategoriesSchema),
+    expressAsyncHandler(categoryController.getSubcategories))
 
 router.delete('/:categoryId',
     validation(categoryValidationSchema.deleteCategorySchema),

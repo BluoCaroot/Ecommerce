@@ -1,6 +1,7 @@
 import slugify from 'slugify'
 
 import Category from '../../../DB/Models/category.model.js'
+import Subcategory from '../../../DB/Models/sub-category.model.js'
 import cloudinaryConnection from '../../utils/cloudinary.js'
 import generateUniqueString from '../../utils/generate-Unique-String.js'
 import * as deletion from '../../utils/deletion.js'
@@ -103,6 +104,14 @@ export const getAllCategories = async (req, res, next) =>
     res.status(200).json({ success: true, message: 'Categories fetched successfully', data: categories })
 }
 
+export const getSubcategories = async (req, res, next) =>
+{
+    const { categoryId } = req.params
+    const subcategories = await Subcategory.find({ categoryId })
+    if (!subcategories) return next({ cause: 404, message: 'Subcategories/Category not found' })
+    res.status(200).json({ success: true, message: 'Subcategories fetched successfully', data: subcategories })
+}
+
 export const deleteCategory = async (req, res, next) =>
 {
     const { categoryId } = req.params
@@ -116,4 +125,12 @@ export const deleteCategory = async (req, res, next) =>
     if (!categoryDeleted) 
         return next({ cause: 500, message: 'Failed to delete category' })
     res.status(200).json({ success: true, message: 'Category deleted successfully' })
+}
+
+export const getCategory = async (req, res, next) =>
+{
+    const { categoryId } = req.params
+    const category = await Category.findById(categoryId)
+    if (!category) return next({ cause: 404, message: 'Category not found' })
+    res.status(200).json({ success: true, message: 'Category fetched successfully', data: category })
 }

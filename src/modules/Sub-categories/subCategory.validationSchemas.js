@@ -38,3 +38,10 @@ export const deleteSubCategorySchema =
     }),
     headers: generalValidationRule.headersRule
 }
+export const getSubCategorySchema =
+{
+    params: Joi.object(
+    {
+        subCategoryId: generalValidationRule.dbId.required()
+    })
+}

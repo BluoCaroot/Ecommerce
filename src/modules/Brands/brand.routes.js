@@ -29,6 +29,7 @@ router.delete('/:brandId',
     expressAsyncHandler(brandController.deleteBrand))
 
 router.get('/',
+    validation(brandValidationSchema.getBrandsSchema),
     expressAsyncHandler(brandController.getBrands))
 
 export default router

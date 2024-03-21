@@ -113,3 +113,11 @@ export const getSubCategoriesWithBrands = async (req, res, next) =>
 
     res.status(200).json({ success: true, message: 'List of subCategories with brands', data: subCategories})
 }
+
+export const getSubCategory = async (req, res, next) =>
+{
+    const { subCategoryId } = req.params
+    const subCategory = await SubCategory.findById(subCategoryId)
+    if (!subCategory) return next({ cause: 404, message: 'SubCategory not found' })
+    res.status(200).json({ success: true, message: 'SubCategory fetched successfully', data: subCategory })
+}

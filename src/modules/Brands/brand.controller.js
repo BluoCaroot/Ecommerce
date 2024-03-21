@@ -6,7 +6,8 @@ import cloudinaryConnection from '../../utils/cloudinary.js'
 import generateUniqueString from '../../utils/generate-Unique-String.js'
 import * as deletion from '../../utils/deletion.js'
 
-export const addBrand = async (req, res, next) => {
+export const addBrand = async (req, res, next) =>
+{
     const { name } = req.body
     const { categoryId, subCategoryId } = req.query
     const { _id } = req.authUser
@@ -38,7 +39,7 @@ export const addBrand = async (req, res, next) => {
     }
 
     const newBrand = await Brand.create(brandObject)
-    req.savedDocuments.push({ model: Brand, _id: newBrand._id, method: "add"})
+    req.savedDocuments.push({ success: true, model: Brand, _id: newBrand._id, method: "add"})
 
 
 
@@ -122,7 +123,12 @@ export const deleteBrand = async (req, res, next) =>
 
 export const getBrands = async (req, res, next) =>
 {
-    const brands = await Brand.find()
+    const { subCategoryId , categoryId } = req.query
+
+    let query = {}
+    if (subCategoryId) query.subCategoryId = subCategoryId
+    if (categoryId) query.categoryId = categoryId
+    const brands = await Brand.find(query)
 
     res.status(200).json({success: true, message: 'List of brands', data: brands})
 }

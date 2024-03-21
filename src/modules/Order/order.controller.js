@@ -78,7 +78,7 @@ export const createOrder = async (req, res, next) =>
 
     if (!productUpdated)
         return next({ message: 'Order could not be placed', cause: 500 })
-    if (coupon)
+    if (couponCode)
     {
         const userCoupon = await CouponUsers.findOne({ couponId: coupon._id, userId: _id })
         req.savedDocuments.push({ model: CouponUsers,
@@ -88,7 +88,7 @@ export const createOrder = async (req, res, next) =>
         userCoupon.usageCount += 1
         const couponUpdated = await userCoupon.save()
         if (!couponUpdated)
-            return next({ message: 'Order could not be placed', cause: 500 })
+            return next({success: true, message: 'Order could not be placed', cause: 500 })
     }
     
     res.status(201).json({message: "Order placed successfully", data: newOrder})
@@ -187,7 +187,7 @@ export const cartToOrder = async (req, res, next) =>
     if (!cartRemoved)
         return next({ message: 'Order could not be placed', cause: 500 })
 
-    res.status(201).json({message: "Order placed successfully", data: newOrder})
+    res.status(201).json({success: true, message: "Order placed successfully", data: newOrder})
 }
 
 export const markOrderAsShipped = async (req, res, next) =>
@@ -207,7 +207,7 @@ export const markOrderAsShipped = async (req, res, next) =>
     })
     if(!updateOrder) return next({message: 'Order not found or cannot be delivered', cause: 404});
 
-    res.status(200).json({message: 'Order delivered successfully', order: updateOrder});
+    res.status(200).json({success: true, message: 'Order delivered successfully', order: updateOrder});
 
 }
 
@@ -234,7 +234,7 @@ export const markOrderAsDelivered = async (req, res, next) =>
 
    if(!updateOrder) return next({message: 'Order not found or cannot be delivered', cause: 404});
 
-    res.status(200).json({message: 'Order delivered successfully', order: updateOrder});
+    res.status(200).json({success: true, message: 'Order delivered successfully', order: updateOrder});
 }
 
 
@@ -260,6 +260,6 @@ export const cancelOrder = async (req, res, next) =>
 
     if(!order) return next({message: 'Order not found or cannot be cancelled', cause: 404});
 
-    res.status(200).json({message: 'Order cancelled successfully', order})
+    res.status(200).json({success: true, message: 'Order cancelled successfully', order})
 
 }

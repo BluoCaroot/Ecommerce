@@ -7,7 +7,7 @@ import { multerMiddleHost } from '../../middlewares/multer.js'
 import { allowedExtensions } from '../../utils/allowed-extensions.js'
 import { endPointsRoles } from './product.endpoints.js'
 import { validation } from '../../middlewares/validation.middleware.js'
-import * as productValidationSchema from './product.validationSchema.js'
+import * as productValidationSchema from './product.validationSchemas.js'
 const router = Router()
 
 
