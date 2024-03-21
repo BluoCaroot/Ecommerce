@@ -86,7 +86,11 @@ export const signIn = async (req, res, next) =>
 
     const token = jwt.sign({ email, id: user._id, loggedIn: true }, process.env.JWT_SECRET_LOGIN, { expiresIn: '1d' })
 
-
+    user.token = token
+    const updatedUser = await user.save()
+    if (!updatedUser)
+        return next(new Error('An error occured, please try again later', { cause: 500 }))
+    
     res.status(200).json(
     {
         success: true,

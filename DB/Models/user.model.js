@@ -54,7 +54,8 @@ const userSchema = new Schema(
         min: 18,
         max: 100
     },
-    isDeleted: { type: Boolean, default: false }
+    isDeleted: { type: Boolean, default: false },
+    token: { type: String }
 
 }, { timestamps: true })
 
