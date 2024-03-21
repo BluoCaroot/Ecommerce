@@ -12,27 +12,14 @@ import orderRouter from './Order/order.routes.js'
 import reviewRouter from './Review/review.routes.js'
 
 export {
-    userRouter,
     authRouter,
+    userRouter,
     categoryRouter,
     subCategoryRouter,
     brandRouter,
     productRouter,
-    cartRouter,
     couponRouter,
+    cartRouter,
     orderRouter,
     reviewRouter
 }
-
-/**
- * auth
- * user
- * category
- * subcategory
- * brand
- * product
- * coupon
- * cart
- * order
- * reviews
- */
