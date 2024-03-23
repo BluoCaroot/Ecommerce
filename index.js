@@ -12,5 +12,5 @@ initiateApp(app, express)
 
 
 /**
- * @todo payment, social login, invoice, api features
+ * @todo social login, invoice, api features
  */

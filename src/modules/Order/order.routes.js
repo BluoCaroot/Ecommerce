@@ -13,6 +13,8 @@ router.post('/',
     auth(endpointsRoles.PLACE_ORDER),
     expressAsyncHandler(orderController.cartToOrder)
 )
+router.post('/webhook',
+    expressAsyncHandler(orderController.stripeWebhook))
 router.post('/:product',
     validation(orderValidationSchema.placeOrderValidation),
     auth(endpointsRoles.PLACE_ORDER),
@@ -33,10 +35,12 @@ router.get('/cancel/:orderId',
     auth(endpointsRoles.CANCEL_ORDER),
     expressAsyncHandler(orderController.cancelOrder)
 )
+router.post('/payment/:orderId',
+    auth(endpointsRoles.PLACE_ORDER),
+    expressAsyncHandler(orderController.payWithStripe))
+router.post('/refund/:orderId',
+    auth(endpointsRoles.PLACE_ORDER),
+    expressAsyncHandler(orderController.refundOrder))
 
 export default router
 
-
-/**
- * @todo payments and refunds
- */

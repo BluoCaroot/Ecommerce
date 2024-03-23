@@ -45,13 +45,14 @@ const orderSchema = new mongoose.Schema(
     paymentMethod:
     {
         type: String,
-        enum: ['Cash' ,'Stripe','Paymob'],
+        enum: ['Cash' ,'Stripe'],
         required: true,
     },
+    paymentIntent: String,
     orderStatus:
     {
         type: String,
-        enum: ['Pending', 'Placed', 'Paid', 'Shipped', 'Delivered', 'Cancelled'],
+        enum: ['Pending', 'Placed', 'Paid', 'Shipped', 'Delivered', 'Cancelled', 'Refunded'],
         required: true,
         default: 'Pending'
     },
@@ -62,6 +63,16 @@ const orderSchema = new mongoose.Schema(
         default: false
     },
     paidAt:
+    {
+        type: Date
+    },
+    isRefunded:
+    {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    refundedAt:
     {
         type: Date
     },

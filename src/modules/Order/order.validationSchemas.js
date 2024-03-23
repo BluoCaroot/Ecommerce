@@ -10,7 +10,7 @@ export const placeOrderValidation =
         quantity: Joi.number().required(),
 
         couponCode: Joi.string().min(3).max(10).alphanum(),
-        paymentMethod: Joi.string().required().valid('Cash', 'Stripe', 'Paymob'),
+        paymentMethod: Joi.string().required().valid('Cash', 'Stripe'),
         phoneNumber: Joi.string().required(),
         address: Joi.string().required(),
         city: Joi.string().required(),

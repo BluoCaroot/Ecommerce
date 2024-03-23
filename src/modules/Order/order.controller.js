@@ -3,6 +3,8 @@ import Product from '../../../DB/Models/product.model.js'
 import CouponUsers from '../../../DB/Models/coupon-users.model.js'
 import { applyCoupon, couponValidation } from '../../utils/coupon.js'
 import Cart from '../../../DB/Models/cart.model.js'
+import { confirmPaymentIntent, createCheckoutSession, createCoupon, createPaymentIntent, refundPaymentIntent } from '../../payment-handler/stripe.js'
+import { DateTime } from 'luxon'
 
 export const createOrder = async (req, res, next) =>
 {
@@ -30,7 +32,7 @@ export const createOrder = async (req, res, next) =>
     }
 
     const productExists = await Product.findById(product)
-    if (!productExists || productExists.countInStock < quantity)
+    if (!productExists || productExists.stock < quantity)
         return next({ message: 'Product is not available', cause: 404 })
     
     let orderItems =
@@ -67,14 +69,7 @@ export const createOrder = async (req, res, next) =>
     
     req.savedDocuments.push({ model: Product, _id: product, method: 'edit', old: productExists.toObject() })
     productExists.stock -= quantity
-    let productUpdated
-    if (!productExists.stock)
-    {
-        productUpdated = await Product.findByIdAndDelete(product)
-        req.savedDocuments[req.savedDocuments.length - 1].method = 'delete'
-    }
-    else
-        productUpdated = await productExists.save()
+    const productUpdated = await productExists.save()
 
     if (!productUpdated)
         return next({ message: 'Order could not be placed', cause: 500 })
@@ -169,14 +164,7 @@ export const cartToOrder = async (req, res, next) =>
         const product = await Product.findById(item.productId)
         req.savedDocuments.push({ model: Product, _id: product._id, method: 'edit', old: product.toObject() })
         product.stock -= item.quantity
-        let productUpdated
-        if (!product.stock)
-        {
-            productUpdated = await Product.findByIdAndDelete(product._id)
-            req.savedDocuments[req.savedDocuments.length - 1].method = 'delete'
-        }
-        else
-            productUpdated = await product.save()
+        const productUpdated = await product.save()
         if (!productUpdated)
             return next({ message: 'Order could not be placed', cause: 500 })
     }
@@ -262,4 +250,102 @@ export const cancelOrder = async (req, res, next) =>
 
     res.status(200).json({success: true, message: 'Order cancelled successfully', order})
 
+}
+
+export const payWithStripe = async (req, res, next) =>
+{
+    const { orderId } = req.params
+    const { _id } = req.authUser
+
+    const order = await Order.findOne(
+    { 
+        _id: orderId, 
+        user: _id,
+        orderStatus: 'Pending',
+        paymentMethod: 'Stripe'
+    })
+    if (!order) return next({ message: 'Order not found or cannot be paid', cause: 404 })
+
+    const paymentObject = 
+    {
+        customer_email: req.authUser.email,
+        metadata: { orderId: order._id.toString() },
+        discounts: [],
+        line_items: order.orderItems.map(product =>
+        {
+            return {
+                price_data:
+                {
+                    currency: 'EGP',
+                    product_data:
+                    {
+                        name: product.title,
+                    },
+                    unit_amount: product.price * 100,
+                },
+                quantity: product.quantity,
+            }
+        
+        })
+    }
+
+    if (order.coupon)
+    {
+        const StripeCoupon = await createCoupon({ couponId: order.coupon })
+        if (StripeCoupon.fail)
+            return next({ message: StripeCoupon.message, cause: 400 })
+        paymentObject.discounts.push({ coupon: StripeCoupon.id })
+    }
+
+    const checkoutSession = await createCheckoutSession(paymentObject)
+    const paymentIntent = await createPaymentIntent({ amount: order.totalPrice, currency: 'EGP' })
+    order.paymentIntent = paymentIntent.id
+    const savedOrder = await order.save()
+    if (!savedOrder)
+        return next({ message: 'Order could not be paid', cause: 500 })
+    res.status(200).json({checkoutSession, paymentIntent})
+}
+
+
+/**
+ * 
+ * @todo review the api
+ */
+export const stripeWebhook = async (req, res, next) =>
+{
+    const orderId = req.body.data.object.metadata.orderId
+
+    const confirmedOrder = await Order.findById(orderId)
+    if (!confirmedOrder) return next({ message: 'Order not found', cause: 404 })
+
+    await confirmPaymentIntent(
+        { paymentIntentId: confirmedOrder.paymentIntent })
+
+    confirmedOrder.orderStatus = 'Paid'
+    confirmedOrder.isPaid = true
+    confirmedOrder.paidAt = DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')
+    await confirmedOrder.save()
+
+    res.status(200).json({ message: 'webhook received' })
+}
+
+export const refundOrder = async (req, res, next) =>
+{
+    const { orderId } = req.params
+    const { _id } = req.authUser
+
+    const order = await Order.findOne(
+    {
+        _id: orderId,
+        isPaid: true
+    })
+    if (!order) return next({ message: 'Order not found or cannot be refunded', cause: 404 })
+
+    const refund = await refundPaymentIntent({ paymentIntentId: order.paymentIntent })
+    if (!refund || refund.status !== 'succeeded')
+        return next({ message: 'Order could not be refunded', cause: 500 })
+    order.orderStatus = 'Refunded'
+    order.isRefunded = true
+    await order.save()
+    res.status(200).json({ message: 'Order refunded successfully', data: refund })
 }

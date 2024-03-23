@@ -37,7 +37,7 @@ export const auth = (accessRoles, require = true) =>
         catch (error) 
         {
             if (error != "TokenExpiredError: jwt expired")
-                return next(Error)
+                return next(error)
                 
             const token = accesstoken.split(process.env.TOKEN_PREFIX)[1]
             const user = await User.findOne({token})

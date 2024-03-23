@@ -28,6 +28,10 @@ export const initiateApp = (app, express) => {
     app.use('/order', routers.orderRouter)
     app.use('/review', routers.reviewRouter)
 
+    app.use('*', (req, res, next) =>
+    {
+        res.status(404).json({ message: 'not found'})
+    })
     app.use(globalResponse, rollbackUploadedFiles, rollbackSavedDocuments)
 
     detectExpiredCoupons()
