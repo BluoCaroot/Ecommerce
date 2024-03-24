@@ -25,7 +25,6 @@ export const createProductSchema =
     headers: generalValidationRule.headersRule
 }
 
-
 export const updateProductSchema = 
 {
     body: Joi.object(
@@ -66,15 +65,5 @@ export const getProductSchema =
 
 export const getAllProductsSchema = 
 {
-    query: Joi.object(
-    {
-        brandId: Joi.alternatives().try(
-            generalValidationRule.dbId,
-            Joi.array().items(generalValidationRule.dbId)),
-        size: Joi.number().required(),
-        page: Joi.number().required(),
-        title: Joi.string(),
-        price: Joi.string(),
-        stock: Joi.string()
-    })
+    query: generalValidationRule.apiFeatures
 }

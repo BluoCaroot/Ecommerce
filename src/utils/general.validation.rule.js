@@ -39,6 +39,25 @@ export const generalValidationRule = {
         'connection': Joi.string(),
         'content-length': Joi.string()
     }),
-    dbId: Joi.string().custom(objectIdValidation)
+    dbId: Joi.string().custom(objectIdValidation),
+
+    apiFeatures: Joi.object(
+    {
+        size: Joi.number().required(),
+        page: Joi.number().required(),
+        sortBy: Joi.string().pattern(/^[a-zA-Z_]+\s+(asc|dsc)$/),
+        filter: Joi.object().pattern(
+            Joi.alternatives().try(
+                Joi.string().pattern(/^[a-zA-Z_]+\[(gt|gte|lt|lte|in|nin|eq|ne|regex)\]$/),
+                Joi.string().pattern(/^[a-zA-Z_]$/)),
+            Joi.alternatives().try(
+                Joi.string(),
+                Joi.number(),
+                Joi.string().custom(objectIdValidation),
+                Joi.array().items(Joi.string().custom(objectIdValidation)))
+        ),
+        populate: Joi.boolean(),
+        populateTo: Joi.string().valid('SubCategory', 'Brand', 'Product', 'Reviews')
+    })
 
 }

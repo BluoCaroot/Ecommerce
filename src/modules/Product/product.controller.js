@@ -7,6 +7,7 @@ import cloudinaryConnection from "../../utils/cloudinary.js"
 import generateUniqueString from "../../utils/generate-Unique-String.js"
 import { paginationFunction } from "../../utils/pagination.js"
 import * as deletion from "../../utils/deletion.js"
+import { APIFeatures } from "../../utils/api-features.js"
 
 
 export const addProduct = async (req, res, next) =>
@@ -155,26 +156,21 @@ export const getProduct = async (req, res, next) =>
 
 export const getAllProducts = async (req, res, next) =>
 {
-    const { brandId, title, price, stock, size, page } = req.query
-
-    const {limit, skip } = paginationFunction({size, page})
+    const { sortBy, size, page, filter, populate, populateTo } = req.query
 
 
-    const query = {}
 
-    if (title || price || stock)
-        query['$and'] = []
+    const features = new APIFeatures(Product.find())
+        .sort(sortBy)
+        .pagination({size, page})
+        .filters(filter)
+    
+    if (populate) 
+        features = features.mongooseQuery.populate('Product', populateTo)
 
-    if (title) query['$and'].push({ title: { $regex: new RegExp("^" + title, "i")} })
-    if (price) query['$and'].push({ appliedPrice: { $lte: +price } })
-    if (stock) query['$and'].push({ stock: { $gte: +stock } })
-    if (brandId) query.brandId = {$in: brandId}
+    const products = await features.mongooseQuery
 
-    const products = await Product.find(query)
-                    .populate([{ path: 'reviews' }])
-                    .limit(limit).skip(skip)
-
-    if (!products.length && (brandId || title || price || stock))
+    if (!products || !products.length)
         return next({ cause: 404, message: 'No product found' })
         
     res.status(200).json({ success: true, data: products })

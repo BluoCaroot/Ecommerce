@@ -31,7 +31,8 @@ router.delete('/:subCategoryId',
     expressAsyncHandler(subCategoryController.deleteSubCategory))
 
 router.get('/', 
-    expressAsyncHandler(subCategoryController.getSubCategoriesWithBrands))
+    validation(subCategoryValidationSchema.getSubCategoriesSchema),
+    expressAsyncHandler(subCategoryController.getSubCategories))
 
 router.get('/:subCategoryId',
     validation(subCategoryValidationSchema.getSubCategorySchema),

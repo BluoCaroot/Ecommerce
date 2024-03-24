@@ -24,6 +24,11 @@ router.get('/' ,
     auth(endpointsRoles.ADD_COUPOUN),
     expressAsyncHandler(couponController.getCoupons))
 
+router.get('/:couponId',
+    validation(couponValidationSchemas.getCouponSchema),
+    auth(endpointsRoles.ADD_COUPOUN),
+    expressAsyncHandler(couponController.getCoupon))
+
 router.put('/toggle/:couponId' ,
     validation(couponValidationSchemas.toggleCouponSchema),
     auth(endpointsRoles.ADD_COUPOUN),

@@ -5,6 +5,7 @@ import subCategory from '../../../DB/Models/sub-category.model.js'
 import cloudinaryConnection from '../../utils/cloudinary.js'
 import generateUniqueString from '../../utils/generate-Unique-String.js'
 import * as deletion from '../../utils/deletion.js'
+import { APIFeatures } from '../../utils/api-features.js'
 
 export const addBrand = async (req, res, next) =>
 {
@@ -123,12 +124,16 @@ export const deleteBrand = async (req, res, next) =>
 
 export const getBrands = async (req, res, next) =>
 {
-    const { subCategoryId , categoryId } = req.query
+    const { sortBy, page, size, filters, populate, populateTo } = req.query
 
-    let query = {}
-    if (subCategoryId) query.subCategoryId = subCategoryId
-    if (categoryId) query.categoryId = categoryId
-    const brands = await Brand.find(query)
-
+    const features = new APIFeatures(Brand.find())
+        .sort(sortBy)
+        .pagination({size, page})
+        .filters(filters)
+    
+    if (populate) 
+        features = features.mongooseQuery.populate('Brand', populateTo)
+    const brands = await features.mongooseQuery
+    if (!brands || !brands.length) return next({ cause: 404, message: 'Brands not found' })
     res.status(200).json({success: true, message: 'List of brands', data: brands})
 }

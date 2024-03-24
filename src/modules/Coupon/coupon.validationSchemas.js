@@ -40,15 +40,21 @@ export const updateCouponSchema =
     headers: generalValidationRule.headersRule
 }
 
-export const getCouponsSchema = 
+export const getCouponSchema = 
 {
     headers: generalValidationRule.headersRule,
     query: Joi.object(
     {
-        type: Joi.string().valid('valid', 'expired'),
         id: generalValidationRule.dbId
-    }).xor('type', 'id')
+    })
 }
+
+export const getCouponsSchema =
+{
+    headers: generalValidationRule.headersRule,
+    query: generalValidationRule.apiFeatures
+}
+
 export const toggleCouponSchema =
 {
     params: Joi.object(

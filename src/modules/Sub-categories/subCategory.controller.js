@@ -5,6 +5,7 @@ import Category from '../../../DB/Models/category.model.js'
 import generateUniqueString from "../../utils/generate-Unique-String.js"
 import cloudinaryConnection from "../../utils/cloudinary.js"
 import * as deletion from "../../utils/deletion.js"
+import { APIFeatures } from "../../utils/api-features.js"
 
 export const addSubCategory = async (req, res, next) =>
 {
@@ -43,7 +44,6 @@ export const addSubCategory = async (req, res, next) =>
 
     res.status(201).json({ success: true, message: 'subCategory created successfully', data: subCategoryCreated })
 }
-
 
 export const updateSubCategory = async (req, res, next) =>
 {
@@ -105,12 +105,22 @@ export const deleteSubCategory = async (req, res, next) =>
     res.status(200).json({ success: true, message: 'Category deleted successfully' })
 }
 
-export const getSubCategoriesWithBrands = async (req, res, next) =>
+export const getSubCategories = async (req, res, next) =>
 {
-    const subCategories = await SubCategory.find().populate([{
-        path: 'Brands'
-    }])
+    const { page, size, sortBy, filters, populate, populateTo } = req.query
 
+    const features = new APIFeatures(SubCategory.find())
+        .sort(sortBy)
+        .pagination({size, page})
+        .filters(filters)
+
+    if (populate)
+        features = features.mongooseQuery.populate('SubCategory', populateTo)
+
+    const subCategories = await features.mongooseQuery
+
+    if (!subCategories || !subCategories.length) return next({ cause: 404, message: 'subCategories not found' })
+    
     res.status(200).json({ success: true, message: 'List of subCategories with brands', data: subCategories})
 }
 

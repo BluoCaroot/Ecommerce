@@ -1,6 +1,7 @@
 import CouponUsers from "../../../DB/Models/coupon-users.model.js";
 import Coupon  from "../../../DB/Models/coupon.model.js";
 import User from "../../../DB/Models/user.model.js";
+import { APIFeatures } from "../../utils/api-features.js";
 
 
 
@@ -70,7 +71,6 @@ export const addCoupon = async (req, res, next) =>
  * @description updates coupon
  * 
  */
-
 export const updateCoupon = async (req, res, next) =>
 {
     const { couponId } = req.params;
@@ -142,22 +142,26 @@ export const toggleCoupon = async (req, res, next) =>
  * @returns coupon or list of coupons
  * @description get coupon by id or list of enabled or disbaled coupons
  */
-
-
 export const getCoupons = async (req, res, next) =>
 {
-    const { type, id } = req.query;
+    const { sortBy, size, page, filter } = req.query;
 
-    if (id)
-    {
-        const coupon = await Coupon.findById(id);
-        if (!coupon)
-            return (next({cause: 400, message: 'Coupon not found'}));
-        return res.status(200).json({success: true, message: 'Coupon found', data: coupon});
-    }
+    const features = new APIFeatures(Coupon.find())
+                    .sort(sortBy)
+                    .pagination({size, page})
+                    .filters(filter);
 
-    const coupons = await Coupon.find({status: type});
-    if (!coupons)
-        return (next({cause: 500, message: 'Error fetching coupons'}));
-    res.status(200).json({success: true, message: `list of ${type} coupons`, data: coupons});
+    const coupons = await features.mongooseQuery
+    if (!coupons || !coupons.length)
+        return (next({cause: 404, message: 'Coupons not found'}));
+    res.status(200).json({success: true, message: `list of coupons`, data: coupons});
+}
+
+export const getCoupon = async (req, res, next) =>
+{
+    const { couponId } = req.params;
+    const coupon = await Coupon.findById(couponId);
+    if (!coupon)
+        return (next({cause: 400, message: 'Coupon not found'}));
+    res.status(200).json({success: true, message: 'Coupon found', data: coupon});
 }

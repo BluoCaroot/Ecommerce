@@ -57,7 +57,7 @@ export const changeEmail = async (req, res, next) =>
         to: email,
         subject: 'Email Verification',
         message: `<h2>please click on this link to verfiy your email</h2>
-        <a href="http://localhost:3000/auth/verify-email?token=${usertoken}">Verify Email</a>`
+        <a href="${req.protocol}://${req.headers.host}/auth/verify-email?token=${usertoken}">Verify Email</a>`
     })
 
     if (!isEmailSent) 

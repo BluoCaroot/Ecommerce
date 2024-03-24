@@ -5,6 +5,9 @@ import { applyCoupon, couponValidation } from '../../utils/coupon.js'
 import Cart from '../../../DB/Models/cart.model.js'
 import { confirmPaymentIntent, createCheckoutSession, createCoupon, createPaymentIntent, refundPaymentIntent } from '../../payment-handler/stripe.js'
 import { DateTime } from 'luxon'
+import { nanoid } from 'nanoid'
+import createInvoice from '../../utils/pdfkit.js'
+import sendEmailService from '../../services/send-email.service.js'
 
 export const createOrder = async (req, res, next) =>
 {
@@ -85,7 +88,37 @@ export const createOrder = async (req, res, next) =>
         if (!couponUpdated)
             return next({success: true, message: 'Order could not be placed', cause: 500 })
     }
+    const orderCode = `${req.authUser.username}_${nanoid(3)}`
+    const orderInvocie =
+    {
+        orderCode,
+        items: orderItems,
+        subTotal: totalPrice,
+        paidAmount: 0,
+        date: newOrder.createdAt,
+        shipping:
+        {
+            name: req.authUser.username,
+            address: newOrder.shippingAddress.address,
+            city: newOrder.shippingAddress.city,
+            state: newOrder.shippingAddress.country,
+            country: newOrder.shippingAddress.country
+        }
+    }
+    createInvoice(orderInvocie, `${orderCode}.pdf`, paymentMethod === 'Cash')
+    const sentEmail = await sendEmailService(
+    {
+        to: req.authUser.email,
+        subject: 'Order Confirmation',
+        message: '<h1>Order Confirmation</h1>\
+        <p>Thank you for your order, your order has been placed successfully, \
+        you can find your invoice below</p>',
+        attachments: [{path: `./Files/${orderCode}.pdf`}]
+    })
     
+    if (!sentEmail)
+        return next({ message: 'Order could not be placed', cause: 500 })
+
     res.status(201).json({message: "Order placed successfully", data: newOrder})
 }
 
@@ -199,7 +232,6 @@ export const markOrderAsShipped = async (req, res, next) =>
 
 }
 
-
 export const markOrderAsDelivered = async (req, res, next) =>
 {
     const { orderId }= req.params;
@@ -224,7 +256,6 @@ export const markOrderAsDelivered = async (req, res, next) =>
 
     res.status(200).json({success: true, message: 'Order delivered successfully', order: updateOrder});
 }
-
 
 export const cancelOrder = async (req, res, next) =>
 {
@@ -305,7 +336,6 @@ export const payWithStripe = async (req, res, next) =>
         return next({ message: 'Order could not be paid', cause: 500 })
     res.status(200).json({checkoutSession, paymentIntent})
 }
-
 
 /**
  * 

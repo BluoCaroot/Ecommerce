@@ -11,32 +11,27 @@ const router = Router();
 router.put('/update', 
     validation(uservalidationSchema.updateUserSchema),
     auth(endPointsRoles.USER_PERMS), 
-    expressAsyncHandler(userRouter.updateUser)
-)
+    expressAsyncHandler(userRouter.updateUser))
 
 router.patch('/email', 
     validation(uservalidationSchema.changeEmailSchema),
     auth(endPointsRoles.USER_PERMS), 
-    expressAsyncHandler(userRouter.changeEmail)
-)
+    expressAsyncHandler(userRouter.changeEmail))
 
 router.patch('/password',
     validation(uservalidationSchema.changePasswordSchema),
     auth(endPointsRoles.USER_PERMS), 
-    expressAsyncHandler(userRouter.changePassword)
-)
+    expressAsyncHandler(userRouter.changePassword))
 
 router.delete('/delete', 
     validation(uservalidationSchema.deleteUserSchema),
     auth(endPointsRoles.USER_PERMS), 
-    expressAsyncHandler(userRouter.deleteUser)
-)
+    expressAsyncHandler(userRouter.deleteUser))
 
 router.get('/:id',
     validation(uservalidationSchema.getUserDataSchema),
     auth(endPointsRoles.USER_PERMS, false), 
-    expressAsyncHandler(userRouter.getUserProfile)
-)
+    expressAsyncHandler(userRouter.getUserProfile))
 
 
 export default router;

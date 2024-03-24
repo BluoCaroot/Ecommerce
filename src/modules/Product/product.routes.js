@@ -16,27 +16,22 @@ router.post('/',
     multerMiddleHost(allowedExtensions.image ).array('image', 3),
     validation(productValidationSchema.createProductSchema),
     auth(endPointsRoles.PODUCT_RULES),
-    expressAsyncHandler(productController.addProduct)
-)
-
+    expressAsyncHandler(productController.addProduct))
 
 router.put('/:productId',
     multerMiddleHost(allowedExtensions.image).single('image'),
     validation(productValidationSchema.updateProductSchema),
     auth(endPointsRoles.PODUCT_RULES),
-    expressAsyncHandler(productController.updateProduct)
-)
+    expressAsyncHandler(productController.updateProduct))
 
 router.delete('/:productId',
     validation(productValidationSchema.deleteProductSchema),
     auth(endPointsRoles.PODUCT_RULES),
-    expressAsyncHandler(productController.deleteProduct)
-)
+    expressAsyncHandler(productController.deleteProduct))
 
 router.get('/',
     validation(productValidationSchema.getAllProductsSchema),
     expressAsyncHandler(productController.getAllProducts))
-
 
 router.get('/:productId',
     validation(productValidationSchema.getProductSchema),

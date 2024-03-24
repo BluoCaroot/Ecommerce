@@ -14,6 +14,7 @@ export const updateUserSchema =
     }),
     headers: generalValidationRule.headersRule
 }
+
 export const changeEmailSchema = 
 {
     body: Joi.object(
@@ -24,6 +25,7 @@ export const changeEmailSchema =
     headers: generalValidationRule.headersRule
 
 }
+
 export const changePasswordSchema = 
 {
     body: Joi.object(
@@ -33,6 +35,7 @@ export const changePasswordSchema =
     }).required(),
     headers: generalValidationRule.headersRule
 }
+
 export const deleteUserSchema =
 {
     body: Joi.object(

@@ -12,5 +12,5 @@ initiateApp(app, express)
 
 
 /**
- * @todo social login, invoice, api features
+ * @todo deploy the app on render
  */

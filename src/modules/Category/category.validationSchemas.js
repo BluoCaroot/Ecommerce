@@ -50,3 +50,8 @@ export const deleteCategorySchema =
     }),
     headers: generalValidationRule.headersRule
 }
+
+export const getAllCategoriesSchema =
+{
+    query: generalValidationRule.apiFeatures
+}
