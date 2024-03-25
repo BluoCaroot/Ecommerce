@@ -8,6 +8,7 @@ import { DateTime } from 'luxon'
 import { nanoid } from 'nanoid'
 import createInvoice from '../../utils/pdfkit.js'
 import sendEmailService from '../../services/send-email.service.js'
+import Stripe from 'stripe'
 
 export const createOrder = async (req, res, next) =>
 {
@@ -35,7 +36,7 @@ export const createOrder = async (req, res, next) =>
     }
 
     const productExists = await Product.findById(product)
-    if (!productExists || productExists.stock < quantity)
+    if (!productExists || productExists.stock < quantity || productExists.isDeleted)
         return next({ message: 'Product is not available', cause: 404 })
     
     let orderItems =
@@ -226,7 +227,7 @@ export const markOrderAsShipped = async (req, res, next) =>
     {
         new: true
     })
-    if(!updateOrder) return next({message: 'Order not found or cannot be delivered', cause: 404});
+    if(!updateOrder) return next({message: 'Order not found or cannot be shipped', cause: 404});
 
     res.status(200).json({success: true, message: 'Order delivered successfully', order: updateOrder});
 
@@ -267,7 +268,7 @@ export const cancelOrder = async (req, res, next) =>
     const order = await Order.findOneAndUpdate(
     {
         _id: orderId,
-        orderStatus: {$in: ['pending', 'placed']}
+        orderStatus: {$in: ['Pending', 'Placed']}
     },{
         orderStatus: 'Cancelled',
         cancelledBy: _id,
@@ -344,7 +345,7 @@ export const payWithStripe = async (req, res, next) =>
 export const stripeWebhook = async (req, res, next) =>
 {
     const orderId = req.body.data.object.metadata.orderId
-
+    
     const confirmedOrder = await Order.findById(orderId)
     if (!confirmedOrder) return next({ message: 'Order not found', cause: 404 })
 
@@ -367,6 +368,7 @@ export const refundOrder = async (req, res, next) =>
     const order = await Order.findOne(
     {
         _id: orderId,
+        user: _id,
         isPaid: true
     })
     if (!order) return next({ message: 'Order not found or cannot be refunded', cause: 404 })

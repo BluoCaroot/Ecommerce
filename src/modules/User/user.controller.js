@@ -71,7 +71,6 @@ export const changeEmail = async (req, res, next) =>
     })
 }
 
-
 export const changePassword = async (req, res, next) =>
 {
     const {authUser} = req
@@ -101,7 +100,7 @@ export const changePassword = async (req, res, next) =>
 export const deleteUser = async (req, res, next) =>
 {
     const { authUser } = req
-    const {password} = req.body
+    const { password } = req.body
 
     const user = await User.findById(authUser._id)
     const isPasswordCorrect = bcrypt.compareSync(password, user.password)
@@ -124,7 +123,10 @@ export const getUserProfile = async (req, res, next) =>
     const { id } = req.params
     const user = await User.findById(id)
 
-    const ret = {}
+    if (!user || user.isDeleted)
+        return next(new Error('User not found', { cause: 404 }))
+
+    let ret = {}
     ret.username = user.username
     ret.age = user.age
     ret.phoneNumbers = user.phoneNumbers

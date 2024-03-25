@@ -43,10 +43,6 @@ export const signUp = async (req, res, next) => {
     })
 }
 
-
-
-
-
 export const verifyEmail = async (req, res, next) => 
 {
     const { token } = req.query
@@ -69,8 +65,6 @@ export const verifyEmail = async (req, res, next) =>
         message: 'Email verified successfully'
     })
 }
-
-
 
 export const signIn = async (req, res, next) => 
 {
@@ -100,7 +94,6 @@ export const signIn = async (req, res, next) =>
         data: { token: process.env.TOKEN_PREFIX + token }
     })
 }
-
 
 export const resendEmail = async (req, res, next) =>
 {

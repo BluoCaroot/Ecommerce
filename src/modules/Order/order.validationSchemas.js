@@ -67,3 +67,21 @@ export const cancelOrderValidation =
     }).required(),
     headers: generalValidationRule.headersRule
 }
+
+export const payWithStripeValidation =
+{
+    params: Joi.object(
+    {
+        orderId: generalValidationRule.dbId
+    }).required(),
+    headers: generalValidationRule.headersRule
+}
+
+export const refundOrderValidation =
+{
+    params: Joi.object(
+    {
+        orderId: generalValidationRule.dbId
+    }).required(),
+    headers: generalValidationRule.headersRule
+}

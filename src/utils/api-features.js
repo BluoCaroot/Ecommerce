@@ -83,6 +83,8 @@ export class APIFeatures {
             discount[ne]=0
             title[regex]=iphone
         */
+        if (!filters)
+            return this
         const queryFilter = JSON.parse(
             JSON.stringify(filters).replace(
                 /gt|gte|lt|lte|in|nin|eq|ne|regex/g,

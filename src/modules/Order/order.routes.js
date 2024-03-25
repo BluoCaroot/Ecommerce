@@ -11,35 +11,39 @@ const router = Router()
 router.post('/',
     validation(orderValidationSchema.checkOutValidation),
     auth(endpointsRoles.PLACE_ORDER),
-    expressAsyncHandler(orderController.cartToOrder)
-)
+    expressAsyncHandler(orderController.cartToOrder))
+
 router.post('/webhook',
     expressAsyncHandler(orderController.stripeWebhook))
+
 router.post('/:product',
     validation(orderValidationSchema.placeOrderValidation),
     auth(endpointsRoles.PLACE_ORDER),
-    expressAsyncHandler(orderController.createOrder)
-)
-router.get('/ship/:orderId',
+    expressAsyncHandler(orderController.createOrder))
+
+router.put('/ship/:orderId',
     validation(orderValidationSchema.markOrderAsShippedValidation),
     auth(endpointsRoles.DELIVER_ORDER),
-    expressAsyncHandler(orderController.markOrderAsShipped)
-)
-router.get('/deliver/:orderId',
+    expressAsyncHandler(orderController.markOrderAsShipped))
+
+router.put('/deliver/:orderId',
     validation(orderValidationSchema.markOrderAsDeliveredValidation),
     auth(endpointsRoles.DELIVER_ORDER),
-    expressAsyncHandler(orderController.markOrderAsDelivered)
-)
-router.get('/cancel/:orderId',
+    expressAsyncHandler(orderController.markOrderAsDelivered))
+
+router.put('/cancel/:orderId',
     validation(orderValidationSchema.cancelOrderValidation),
     auth(endpointsRoles.CANCEL_ORDER),
-    expressAsyncHandler(orderController.cancelOrder)
-)
+    expressAsyncHandler(orderController.cancelOrder))
+
 router.post('/payment/:orderId',
+    validation(orderValidationSchema.payWithStripeValidation),
     auth(endpointsRoles.PLACE_ORDER),
     expressAsyncHandler(orderController.payWithStripe))
-router.post('/refund/:orderId',
-    auth(endpointsRoles.PLACE_ORDER),
+
+router.put('/refund/:orderId',
+    validation(orderValidationSchema.refundOrderValidation),
+    auth(endpointsRoles.REFUND_ORDER),
     expressAsyncHandler(orderController.refundOrder))
 
 export default router

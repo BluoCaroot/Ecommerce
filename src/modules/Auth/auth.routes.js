@@ -23,6 +23,12 @@ router.post('/login',
     validation(authValidationSchema.logInSchema),
     expressAsyncHandler(authController.signIn))
 
+router.post('/forget-password',
+    validation(authValidationSchema.forgetPasswordSchema),
+    expressAsyncHandler(authController.forgetPassword))
 
+router.put('/reset-password',
+    validation(authValidationSchema.resetPasswordSchema),
+    expressAsyncHandler(authController.resetPassword))
 
 export default router;

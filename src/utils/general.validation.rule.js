@@ -49,7 +49,7 @@ export const generalValidationRule = {
         filter: Joi.object().pattern(
             Joi.alternatives().try(
                 Joi.string().pattern(/^[a-zA-Z_]+\[(gt|gte|lt|lte|in|nin|eq|ne|regex)\]$/),
-                Joi.string().pattern(/^[a-zA-Z_]$/)),
+                Joi.string()),
             Joi.alternatives().try(
                 Joi.string(),
                 Joi.number(),
@@ -58,6 +58,6 @@ export const generalValidationRule = {
         ),
         populate: Joi.boolean(),
         populateTo: Joi.string().valid('SubCategory', 'Brand', 'Product', 'Reviews')
-    })
+    }).with('populate', 'populateTo')
 
 }

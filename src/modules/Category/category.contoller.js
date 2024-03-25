@@ -107,14 +107,13 @@ export const deleteCategory = async (req, res, next) =>
 export const getAllCategories = async (req, res, next) =>
 {
     const { sortBy, page, size, filter, populate, populateTo } = req.query
-    const features = new APIFeatures(Category.find())
+    const features = new APIFeatures(Category.find({ isDeleted: false}))
         .sort(sortBy)
         .pagination({size, page})
         .filters(filter)
-    
+
     if (populate) 
         features = features.mongooseQuery.populate('Category', populateTo)
-
     const categories = await features.mongooseQuery
     if (!categories || !categories.length) return next({ cause: 404, message: 'Categories not found' })
     res.status(200).json({ success: true, message: 'Categories fetched successfully', data: categories })
@@ -124,6 +123,6 @@ export const getCategory = async (req, res, next) =>
 {
     const { categoryId } = req.params
     const category = await Category.findById(categoryId)
-    if (!category) return next({ cause: 404, message: 'Category not found' })
+    if (!category || category.isDeleted) return next({ cause: 404, message: 'Category not found' })
     res.status(200).json({ success: true, message: 'Category fetched successfully', data: category })
 }

@@ -1,7 +1,7 @@
 import Review from '../../../DB/Models/review.model.js'
 import Order from '../../../DB/Models/order.model.js'
 import Product from '../../../DB/Models/product.model.js'
-
+import * as deletion from '../../utils/deletion.js'
 
 export const createReview = async (req, res, next) =>
 {
@@ -9,7 +9,25 @@ export const createReview = async (req, res, next) =>
     const { rating, review } = req.body
     const { _id: userId } = req.authUser
 
-    const userPurchasedProduct = await Order.findOne({user: userId, /*orderItems: { $elemMatch: { _id: productId } }, */orderStatus: "Delivered"})
+    const userPurchasedProduct = await Order.findOne(
+    {
+        user: userId, 
+        orderItems: 
+        { 
+            $elemMatch:
+            {
+                product: productId
+            }
+        }, 
+        orderStatus: 
+        { 
+            $in: 
+            [
+                "Delivered",
+                "Refunded"
+            ]
+        }
+    })
     if (!userPurchasedProduct)
         return next({cause: 400, message: "You can only review products you have purchased"})
 
@@ -27,15 +45,19 @@ export const createReview = async (req, res, next) =>
     const newReview = await Review.create(reviewObject)
     if (!newReview)
         return next({cause: 500, message: "Failed to create review"})
+
     req.savedDocuments.push({model: Review, _id: newReview._id, method: "add"})
+
     const product = await Product.findById(productId)
     if (!product)
         return next({cause: 404, message: "Failed to create review"})
+
     let {rate, reviewsCount} = product
     rate *= reviewsCount
     reviewsCount++
     rate += rating
     rate /= reviewsCount
+    
     req.savedDocuments.push({model: Product, _id: productId, method: "edit", old: product.toObject()})
 
     product.rate = rate.toFixed(2)
@@ -91,17 +113,17 @@ export const deleteReview = async (req, res, next) =>
     const reviewExists = await Review.findOne({userId, productId})
     if (!reviewExists)
         return next({cause: 404, message: "Review not found"})
+
     
-    req.savedDocuments.push({model: Review, _id: reviewExists._id, method: "delete"})
-    reviewExists.isDeleted = true
-    const deletedReview = await reviewExists.save()
+    
+    const deletedReview = await deletion.deleteReview({reviewId: reviewExists._id, req, _id: userId})
 
     if (!deletedReview)
         return next({cause: 500, message: "Failed to delete review"})
     
     const product = await Product.findById(productId)
     if (!product)
-        return next({cause: 404, message: "Failed to update review"})
+        return next({cause: 404, message: "Failed to delete review"})
     
     let {rate, reviewsCount} = product
     rate *= reviewsCount

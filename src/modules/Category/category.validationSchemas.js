@@ -34,13 +34,6 @@ export const updateCategorySchema =
     headers: generalValidationRule.headersRule
 }
 
-export const getSubcategoriesSchema = 
-{
-    params: Joi.object(
-    {
-        categoryId: generalValidationRule.dbId.required()
-    })
-}
 
 export const deleteCategorySchema = 
 {

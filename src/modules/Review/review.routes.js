@@ -11,22 +11,22 @@ const router = Router()
 router.post('/:productId',
     validation(reviewValidationSchema.createReviewSchema),
     auth([systemRoles.USER]),
-    expressAsyncHandler(reviewController.createReview)
-)
+    expressAsyncHandler(reviewController.createReview))
+
 router.put('/:productId',
     validation(reviewValidationSchema.editReviewSchema),
     auth([systemRoles.USER]),
-    expressAsyncHandler(reviewController.updateReview)
-)
+    expressAsyncHandler(reviewController.updateReview))
+
 router.delete('/:productId',
     validation(reviewValidationSchema.deleteReviewSchema),
     auth([systemRoles.USER]),
-    expressAsyncHandler(reviewController.deleteReview)
-)
+    expressAsyncHandler(reviewController.deleteReview))
+    
 router.get('/:productId',
     validation(reviewValidationSchema.getReviewSchema),
-    expressAsyncHandler(reviewController.getReviews)
-)
+    expressAsyncHandler(reviewController.getReviews))
+
 
 
 export default router

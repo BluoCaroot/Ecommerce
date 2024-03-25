@@ -32,4 +32,9 @@ router.get('/',
     validation(brandValidationSchema.getBrandsSchema),
     expressAsyncHandler(brandController.getBrands))
 
+router.get('/:brandId',
+    validation(brandValidationSchema.getBrandSchema),
+    expressAsyncHandler(brandController.getBrand))
+
+
 export default router

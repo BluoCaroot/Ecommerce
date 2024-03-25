@@ -119,7 +119,7 @@ export const toggleCoupon = async (req, res, next) =>
 {
     const { couponId } = req.params;
     const {_id} = req.authUser
-    const coupon = await Coupon.findById(id);
+    const coupon = await Coupon.findById(couponId);
 
     if (!coupon)
         return (next({cause: 400, message: 'Coupon not found'}));

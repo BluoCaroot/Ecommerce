@@ -14,10 +14,11 @@ export const addBrand = async (req, res, next) =>
     const { _id } = req.authUser
 
     const subCategoryCheck = await subCategory.findById(subCategoryId).populate('categoryId', 'folderId')
-    if (!subCategoryCheck) return next({ message: 'SubCategory not found', cause: 404 })
+    if (!subCategoryCheck || subCategoryCheck.isDeleted)
+        return next({ message: 'SubCategory not found', cause: 404 })
 
     const isBrandExists = await Brand.findOne({ name, subCategoryId })
-    if (isBrandExists) return next({ message: 'Brand already exists for this subCategory', cause: 400 })
+    if (isBrandExists && !isBrandExists.isDeleted) return next({ message: 'Brand already exists for this subCategory', cause: 400 })
 
     if (categoryId != subCategoryCheck.categoryId._id) return next({ message: 'Category not found', cause: 404 })
 
@@ -51,7 +52,6 @@ export const addBrand = async (req, res, next) =>
     })
 
 }
-
 
 export const updateBrand = async (req, res, next) =>
 {
@@ -101,8 +101,6 @@ export const updateBrand = async (req, res, next) =>
     res.status(200).json({ success: true, message: 'Brand updated successfully', data: brand })
 }
 
-
-
 export const deleteBrand = async (req, res, next) =>
 {
     const { brandId } = req.params
@@ -115,18 +113,17 @@ export const deleteBrand = async (req, res, next) =>
     if (brand.addedBy.toString() !== _id.toString() && role !== systemRoles.SUPER_ADMIN)
         return next({ cause: 403, message: 'Missing permission to delete'})
 
-    const brandDeleted = await deletion.deleteBrand(brandId, req, _id)
+    const brandDeleted = await deletion.deleteBrand({brandId, req, _id})
     if (!brandDeleted) 
         return next({ cause: 500, message: 'Failed to delete brand' })
     res.status(200).json({ success: true, message: 'Brand deleted successfully' })
 }
 
-
 export const getBrands = async (req, res, next) =>
 {
     const { sortBy, page, size, filters, populate, populateTo } = req.query
 
-    const features = new APIFeatures(Brand.find())
+    const features = new APIFeatures(Brand.find({isDeleted: false}))
         .sort(sortBy)
         .pagination({size, page})
         .filters(filters)
@@ -136,4 +133,12 @@ export const getBrands = async (req, res, next) =>
     const brands = await features.mongooseQuery
     if (!brands || !brands.length) return next({ cause: 404, message: 'Brands not found' })
     res.status(200).json({success: true, message: 'List of brands', data: brands})
+}
+
+export const getBrand = async (req, res, next) =>
+{
+    const { brandId } = req.params
+    const brand = await Brand.findById(brandId)
+    if (!brand || brand.isDeleted) return next({ cause: 404, message: 'Brand not found' })
+    res.status(200).json({success: true, message: 'Brand found', data: brand})
 }

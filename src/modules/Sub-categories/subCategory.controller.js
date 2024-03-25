@@ -18,7 +18,8 @@ export const addSubCategory = async (req, res, next) =>
         return next({ cause: 409, message: 'SubCategory name already exists' })
 
     const category = await Category.findById(categoryId)
-    if (!category) return next({ cause: 404, message: 'Category not found' })
+    if (!category || category.isDeleted)
+        return next({ cause: 404, message: 'Category not found' })
 
     const slug = slugify(name, '-')
 
@@ -109,7 +110,7 @@ export const getSubCategories = async (req, res, next) =>
 {
     const { page, size, sortBy, filters, populate, populateTo } = req.query
 
-    const features = new APIFeatures(SubCategory.find())
+    const features = new APIFeatures(SubCategory.find({isDeleted: false}))
         .sort(sortBy)
         .pagination({size, page})
         .filters(filters)
@@ -121,13 +122,13 @@ export const getSubCategories = async (req, res, next) =>
 
     if (!subCategories || !subCategories.length) return next({ cause: 404, message: 'subCategories not found' })
     
-    res.status(200).json({ success: true, message: 'List of subCategories with brands', data: subCategories})
+    res.status(200).json({ success: true, message: 'List of subCategories', data: subCategories})
 }
 
 export const getSubCategory = async (req, res, next) =>
 {
     const { subCategoryId } = req.params
     const subCategory = await SubCategory.findById(subCategoryId)
-    if (!subCategory) return next({ cause: 404, message: 'SubCategory not found' })
+    if (!subCategory || subCategory.isDeleted) return next({ cause: 404, message: 'SubCategory not found' })
     res.status(200).json({ success: true, message: 'SubCategory fetched successfully', data: subCategory })
 }

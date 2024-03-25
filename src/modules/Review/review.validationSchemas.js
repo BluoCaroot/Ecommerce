@@ -41,6 +41,5 @@ export const getReviewSchema =
     params: Joi.object(
     {
         productId: generalValidationRule.dbId.required()
-    }),
-    headers: generalValidationRule.headersRule
+    })
 }

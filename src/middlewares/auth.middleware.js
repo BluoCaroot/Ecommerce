@@ -26,7 +26,8 @@ export const auth = (accessRoles, require = true) =>
 
             // user check 
             const foundUser = await User.findById(decodedData.id, 'username email role') // loggdInUser Role
-            if (!foundUser) throw (new Error('please signUp first', { cause: 404 }))
+            if (!foundUser || foundUser.isDeleted) 
+                throw (new Error('please signUp first', { cause: 404 }))
 
             // auhtorization
             if (!accessRoles.includes(foundUser.role)) throw (new Error('unauthorized', { cause: 401 }))

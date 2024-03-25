@@ -18,7 +18,7 @@ export const addProductToCart = async (req, res, next) =>
     const {_id} = req.authUser;
 
     const doesProductExist = await Product.findById(productId);
-    if (!doesProductExist || doesProductExist.stock < quantity)
+    if (!doesProductExist || doesProductExist.stock < quantity || doesProductExist.isDeleted)
         return (next({cause: 404, message: 'Product not found or not available'}));
     
     const userCart = await Cart.findOne({userId: _id});

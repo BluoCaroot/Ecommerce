@@ -18,7 +18,8 @@ export const addProduct = async (req, res, next) =>
     const addedBy = req.authUser._id
 
     const brand = await Brand.findById(brandId)
-    if (!brand) return next({ cause: 404, message: 'Brand not found' })
+    if (!brand || brand.isDeleted)
+        return next({ cause: 404, message: 'Brand not found' })
 
     if (brand.categoryId.toString() !== categoryId) return next({ cause: 400, message: 'Brand not found in this category' })
     if (brand.subCategoryId.toString() !== subCategoryId) return next({ cause: 400, message: 'Brand not found in this sub-category' })
@@ -59,8 +60,6 @@ export const addProduct = async (req, res, next) =>
 
     res.status(201).json({ success: true, message: 'Product created successfully', data: newProduct })
 }
-
-
 
 export const updateProduct = async (req, res, next) =>
 {
@@ -149,7 +148,7 @@ export const getProduct = async (req, res, next) =>
     const product = await Product.findById(productId)
                     .populate([{ path: 'reviews' }])
 
-    if (!product) return next({ cause: 404, message: 'Product not found' })
+    if (!product || product.isDeleted) return next({ cause: 404, message: 'Product not found' })
     
     res.status(200).json({ success: true, data: product })
 }
@@ -160,7 +159,7 @@ export const getAllProducts = async (req, res, next) =>
 
 
 
-    const features = new APIFeatures(Product.find())
+    const features = new APIFeatures(Product.find({isDeleted: false}))
         .sort(sortBy)
         .pagination({size, page})
         .filters(filter)

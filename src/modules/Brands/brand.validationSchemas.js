@@ -48,3 +48,11 @@ export const getBrandsSchema =
 {
     query: generalValidationRule.apiFeatures
 }
+
+export const getBrandSchema =
+{
+    params: Joi.object(
+    {
+        brandId: generalValidationRule.dbId.required()
+    })
+}

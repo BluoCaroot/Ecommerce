@@ -2,6 +2,7 @@ import { scheduleJob } from "node-schedule"
 import { DateTime } from "luxon"
 
 import Order from "../../DB/Models/order.model.js"
+import User from "../../DB/Models/user.model.js"
 import Coupon from "../../DB/Models/coupon.model.js"
 import Product from "../../DB/Models/product.model.js"
 import Brand from "../../DB/Models/brand.model.js"
@@ -12,7 +13,6 @@ import cloudinaryConnection from "./cloudinary.js"
 export function detectExpiredCoupons()
 {
     scheduleJob("0 0 * * *", async () => {
-		console.log("running")
         const coupons = await Coupon.find({status: "valid"})
         for (const coupon of coupons)
         {
@@ -43,7 +43,7 @@ export function detectUnconfirmedOrders()
 
 export function DeleteOldImages()
 {
-    scheduleJob("* * * 1 *", async () =>
+    scheduleJob("0 0 * * *", async () =>
     {
         const products = await Product.find({isDeleted: true, imagesDeleted: false})
         for (const product of products)
@@ -92,6 +92,21 @@ export function DeleteOldImages()
             await cloudinaryConnection().api.delete_folder(folderPath)
             category.imagesDeleted = true
             await category.save()
+        }
+    })
+}
+
+export function detecteUncofirmedUsers()
+{
+    scheduleJob("0 0 * * *", async () => {
+        const users = await User.find({isEmailVerified: false})
+        for (const user of users)
+        {
+            if (DateTime.fromISO(user.createdAt) < DateTime.now().minus({days: 7}))
+            {
+                user.isEmailVerified = true
+                await user.save()
+            }
         }
     })
 }
