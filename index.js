@@ -12,5 +12,5 @@ initiateApp(app, express)
 
 
 /**
- * @todo deploy the app on render
+ * @todo add comments
  */

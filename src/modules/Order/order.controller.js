@@ -31,7 +31,6 @@ export const createOrder = async (req, res, next) =>
         const couponValid = await couponValidation(couponCode, _id)
         if (couponValid.error)
             return next({ message: couponValid.message, cause: couponValid.status })
-        console.log(couponValid)
         coupon = couponValid
     }
 

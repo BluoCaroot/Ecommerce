@@ -145,7 +145,7 @@ export const getReviews = async (req, res, next) =>
 {
     const { productId } = req.params
     const reviews = await Review.find({productId, isDeleted: false})
-    if (!reviews)
+    if (!reviews.length)
         return next({cause: 404, message: "No reviews found"})
     res.status(200).json({success: true, message: "Reviews retrieved successfully", data: reviews})
 }
