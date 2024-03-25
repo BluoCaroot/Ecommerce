@@ -24,7 +24,7 @@ const brandSchema = new Schema({
     toObject: { virtuals: true }
 })
 
-brandSchema.virtual('products',
+brandSchema.virtual('Products',
 {
     ref: 'Product',
     localField: '_id',

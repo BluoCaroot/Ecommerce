@@ -128,8 +128,9 @@ export const getBrands = async (req, res, next) =>
         .pagination({size, page})
         .filters(filters)
     
-    if (populate) 
-        features = features.mongooseQuery.populate('Brand', populateTo)
+    if (populate)
+        features.population('Brands', populateTo)
+
     const brands = await features.mongooseQuery
     if (!brands || !brands.length) return next({ cause: 404, message: 'Brands not found' })
     res.status(200).json({success: true, message: 'List of brands', data: brands})

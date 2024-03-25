@@ -1,7 +1,7 @@
 import { paginationFunction } from "./pagination.js"
 
-let populationPath = ["Category", "SubCategory", "Brand",
-                        "Product", "Review"]
+let populationPath = ["Categories", "SubCategories", "Brands",
+                        "Products", "Reviews"]
 
 
 function population(current, end)
@@ -102,7 +102,7 @@ export class APIFeatures {
 
     
 
-    populate(begin, end)
+    population(begin, end)
     {
         let ind = 0, ind2 = 0
         while (ind < populationPath.length && populationPath[ind] != begin)

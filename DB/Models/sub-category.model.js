@@ -27,7 +27,7 @@ const subCategorySchema = new Schema({
     toObject: { virtuals: true }
 })
 
-subCategorySchema.virtual('brands', {
+subCategorySchema.virtual('Brands', {
     ref: 'Brand',
     localField: '_id',
     foreignField: 'subCategoryId',

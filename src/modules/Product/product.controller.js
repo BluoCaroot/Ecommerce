@@ -165,7 +165,7 @@ export const getAllProducts = async (req, res, next) =>
         .filters(filter)
     
     if (populate) 
-        features = features.mongooseQuery.populate('Product', populateTo)
+        features.population('Products', populateTo)
 
     const products = await features.mongooseQuery
 

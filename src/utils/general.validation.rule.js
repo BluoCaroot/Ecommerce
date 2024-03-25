@@ -57,7 +57,7 @@ export const generalValidationRule = {
                 Joi.array().items(Joi.string().custom(objectIdValidation)))
         ),
         populate: Joi.boolean(),
-        populateTo: Joi.string().valid('SubCategory', 'Brand', 'Product', 'Reviews')
+        populateTo: Joi.string().valid('SubCategories', 'Brands', 'Products', 'Reviews')
     }).with('populate', 'populateTo')
 
 }

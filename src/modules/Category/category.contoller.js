@@ -113,7 +113,7 @@ export const getAllCategories = async (req, res, next) =>
         .filters(filter)
 
     if (populate) 
-        features = features.mongooseQuery.populate('Category', populateTo)
+        features.population('Categories', populateTo)
     const categories = await features.mongooseQuery
     if (!categories || !categories.length) return next({ cause: 404, message: 'Categories not found' })
     res.status(200).json({ success: true, message: 'Categories fetched successfully', data: categories })

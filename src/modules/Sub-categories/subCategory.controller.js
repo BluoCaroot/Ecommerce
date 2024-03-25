@@ -116,7 +116,7 @@ export const getSubCategories = async (req, res, next) =>
         .filters(filters)
 
     if (populate)
-        features = features.mongooseQuery.populate('SubCategory', populateTo)
+        features.population('SubCategories', populateTo)
 
     const subCategories = await features.mongooseQuery
 
